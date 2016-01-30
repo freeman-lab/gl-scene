@@ -1,6 +1,6 @@
 # gl-scene
 
-Assemble simple 3d scenes using stack.gl components. The goal of this module is to make it easy to assemble scenes, at a slightly higher level of abstraction, while maintaining full flexibility and composability with the stack.gl ecosystem.
+Assemble simple 3d scenes using stack.gl components. The goal of this module is to make it easy to assemble scenes with objects and lights at a slightly higher level of abstraction, while maintaining full flexibility and composability with the stack.gl ecosystem.
 
 ### install
 
@@ -22,14 +22,13 @@ First construct the scene using a `webgl` context.
 
 ```javascript
 var context = require('gl-now')()
-var Scene = require('gl-scene')
-
-var scene = Scene(context.gl)
+var scene = require('gl-scene')(context.gl)
 ```
 
-Define one or more shapes by specifying an `id`, a `class`, a simplicial `complex`, and a `move` matrix. Here, we'll just make two translated spheres.
+A scene consists of shapes and lights. Define one or more shapes by specifying an `id`, a `class`, a simplicial `complex`, and a `move` matrix. Here, we'll just make two translated spheres.
 
 ```javascript
+var mat4 = require('gl-mat4')
 var icosphere = require('icosphere')
 
 var shapes = [
@@ -48,7 +47,7 @@ var shapes = [
 ]
 ```
 
-Now define style options for these shapes. You just need to define a mapping from `id` or `class` to options. For any shape, the options from both `class` and `id` will be used, but if they conflict the `id` will take precedence.
+Now define style options for these shapes by mapping from `id` or `class` to options.
 
 ```javascript
 var opts = {
