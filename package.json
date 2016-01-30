@@ -1,0 +1,27 @@
+{
+  "name": "gl-scene",
+  "version": "1.0.0",
+  "description": "assemble simple 3d scenes using stack.gl",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/freeman-lab/gl-scene.git"
+  },
+  "keywords": [
+    "scene",
+    "webgl",
+    "3d",
+    "stack.gl",
+    "animation",
+    "visualization"
+  ],
+  "author": "freeman-lab",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/freeman-lab/gl-scene/issues"
+  },
+  "homepage": "https://github.com/freeman-lab/gl-scene#readme"
+}
