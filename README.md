@@ -25,7 +25,7 @@ var context = require('gl-now')()
 var scene = require('gl-scene')(context.gl)
 ```
 
-A scene consists of shapes and lights. Define one or more shapes by specifying an `id`, a `class`, a simplicial `complex`, and a `move` matrix. Here, we'll just make two translated spheres.
+A scene consists of shapes and lights. Here, we'll just make two translated spheres.
 
 ```javascript
 var mat4 = require('gl-mat4')
@@ -74,10 +74,11 @@ scene.draw()
 If you want a dynamic camera, make on, and then call `update` and `draw` on your render event
 
 ```javascript
-var camera = require('canvas-orbit-camera')'
+var camera = require('canvas-orbit-camera')
 
 context.on('gl-render', function (t) {
 	camera.tick()
 	scene.update(camera)
 	scene.draw()	
 })
+```
