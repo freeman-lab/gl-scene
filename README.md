@@ -86,23 +86,25 @@ context.on('gl-render', function (t) {
 })
 ```
 
-### shapes
+### core components
+
+##### `shapes`
 
 Specify a list of shapes each with an `id`, `class`, `complex`, and `move`
 Specify a list of style options each with a tag `#id` or `.class` and a set of options.
 
-### lights
+##### `lights`
 
 Specify a list of lights each with an `id`, `class`, and `move`.
 Specify a list of style options each with a tag `#id` or `.class` and a set of options.
 
-### shaders
+##### `shaders`
 
 Several default shaders (corresponding to different materials) are included, and for many simple scenes you won't need to work with them directly, but it's easy to pass your own shaders as well.
 
 TODO explain how
 
-### API
+### methods
 
 #### initialization
 
