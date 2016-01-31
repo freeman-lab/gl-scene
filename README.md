@@ -104,22 +104,44 @@ TODO explain how
 
 ### API
 
-scene(gl)
+#### initialization
 
-scene.shapes(shapes, opts)
+##### `scene(gl, opts)`
 
-scene.lights(lights, opts)
+Construct a scene by providing a `webgl` context.
 
-scene.shaders(shaders)
+##### `scene.shapes(shapes, styles)`
 
-scene.find(selector)
+Add a list of `shapes` to the scene, using a set of `styles`.
 
-scene.move(selector, cb)
+##### `scene.lights(lights, styles)`
 
-scene.hide(selector)
+Add a list of `lights` to the scene, alongside a set of `styles.
 
-scene.show(selector)
+##### `scene.materials(materials)`
 
-### defaults
+Specify a list of material to use, if not provided will use sensible defaults, as follows. For shapes without a material, the material will be `flat`. If a shape has undefined material properties, they will be replaced with the default.
 
-Try to use sensible defaults. If no material is specified, will use `flat`. For each shape, missing attributes will be set to their default as specified in the material definition.
+#### rendering
+
+##### `scene.init()`
+
+Initialize the scene, check that required properties are defined, and replace missing properties with defaults where possible.
+
+##### `scene.update(camera)`
+
+Update the scene's projection and view matrices from the provided `camera`, which must have a `view` method. For examples see: `canvas-orbit-camera`
+
+##### scene.draw()
+
+Draw the scene to the `webgl` context.
+
+#### manipulation
+
+##### `scene.hide(tag)`
+
+Hide all elements that match the given tag. Tag should being with `#` to specify an `id` or `.` to specify a `class`. A string will otherwise be treated as an `id`.
+
+##### `scene.show(tag)`
+
+Hide all elements that match the given tag. Tag should being with `#` to specify an `id` or `.` to specify a `class`. A string will otherwise be treated as an `id`.

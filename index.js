@@ -65,14 +65,14 @@ Scene.prototype.shaders = function (shaders) {
 	self._shaders = shaders
 }
 
-Scene.prototype.shapes = function (objects, opts) {
+Scene.prototype.shapes = function (objects, styles) {
   var self = this
 
   var attr
   _.forEach(objects, function (object) {
-    attr = _.find(opts, ['tag', '#' + object.id])
+    attr = _.find(styles, ['tag', '#' + object.id])
     if (attr) _.assign(object, attr)
-    attr = _.find(opts, ['tag', '.' + object.class])
+    attr = _.find(styles, ['tag', '.' + object.class])
   	if (attr) _.assign(object, attr)
   })
 
