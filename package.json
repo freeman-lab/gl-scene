@@ -4,7 +4,13 @@
   "description": "assemble simple 3d scenes using stack.gl",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "budo example.js:bundle.js --watch"
+  },
+  "browserify": {
+    "transform": [
+      "glslify"
+    ]
   },
   "repository": {
     "type": "git",
@@ -23,5 +29,24 @@
   "bugs": {
     "url": "https://github.com/freeman-lab/gl-scene/issues"
   },
-  "homepage": "https://github.com/freeman-lab/gl-scene#readme"
+  "homepage": "https://github.com/freeman-lab/gl-scene#readme",
+  "dependencies": {
+    "canvas-fit": "^1.5.0",
+    "euclidean-distance": "^1.0.0",
+    "eye-vector": "0.0.0",
+    "gl-context": "^0.1.1",
+    "gl-geometry": "^3.1.0",
+    "gl-mat4": "^1.1.4",
+    "gl-shader": "^4.2.0",
+    "glsl-diffuse-oren-nayar": "^1.0.2",
+    "glsl-fog": "0.0.1",
+    "glslify": "^5.0.2",
+    "lodash": "^4.1.0",
+    "normals": "^1.0.1"
+  },
+  "devDependencies": {
+    "canvas-orbit-camera": "^1.0.2",
+    "gl-now": "^1.4.0",
+    "icosphere": "^1.0.0"
+  }
 }
