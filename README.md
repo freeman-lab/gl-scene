@@ -116,7 +116,7 @@ Add a list of `shapes` to the scene, using a set of `styles`.
 
 ##### `scene.lights(lights, styles)`
 
-Add a list of `lights` to the scene, alongside a set of `styles.
+Add a list of `lights` to the scene, alongside a set of `styles`.
 
 ##### `scene.materials(materials)`
 
