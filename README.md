@@ -1,6 +1,6 @@
 # gl-scene
 
-Assemble simple 3d scenes using stack.gl components. The goal of this module is to make it easy to assemble scenes with objects and lights at a slightly higher level of abstraction, while maintaining full flexibility and composability with the stack.gl ecosystem. You can think of this module as a high-level wrapper for `gl-geometry`, `gl-shader`, and `gl-mat4`, with a simple selector-based scheme for manipulating and controlling the appearence of shapes and lights.
+Assemble simple 3d scenes using stack.gl components. The goal of this module is to make it easy to assemble shapes and lights into a scene, at a slightly higher level of abstraction, while maintaining full flexibility and composability with the stack.gl ecosystem. You can think of this module as a wrapper for `gl-geometry`, `gl-shader`, and `gl-mat4`, with a simple selector-based system for controlling appearences.
 
 ### install
 
