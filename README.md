@@ -132,7 +132,7 @@ Initialize the scene, check that required properties are defined, and replace mi
 
 Update the scene's projection and view matrices from the provided `camera`, which must have a `view` method. For examples see: `canvas-orbit-camera`
 
-##### scene.draw()
+##### `scene.draw()`
 
 Draw the scene to the `webgl` context.
 
