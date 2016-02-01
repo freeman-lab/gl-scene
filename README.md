@@ -122,13 +122,13 @@ Add a list of `lights` to the scene, alongside a set of `styles`.
 
 ##### `scene.materials(materials)`
 
-Specify a list of material to use, if not provided will use sensible defaults, as follows. For shapes without a material, the material will be `flat`. If a shape has undefined material properties, they will be replaced with the default.
+Specify a list of materials to use.
 
 #### rendering
 
 ##### `scene.init()`
 
-Initialize the scene, check that required properties are defined, and replace missing properties with defaults where possible.
+Initialize the scene, check that required properties are defined, and replace missing properties with defaults where possible, as follows. For shapes without a material, the material will be `flat`. If a shape has undefined material properties, they will be replaced with the defaults.
 
 ##### `scene.update(camera)`
 

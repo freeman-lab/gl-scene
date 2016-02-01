@@ -1,14 +1,17 @@
 var Shader = require('gl-shader')
 var Geometry = require('gl-geometry')
 var mat4 = require('gl-mat4')
+var mat3 = require('gl-mat3')
 var eye = require('eye-vector')
 var normals = require('normals')
 var glslify = require('glslify')
 var distance = require('euclidean-distance')
+var reindex = require('mesh-reindex')
+var unindex = require('unindex-mesh')
 var _ = require('lodash')
 
 function Scene (gl, opts) {
-  if (!(this instanceof Scene)) return new Scene(gl)
+  if (!(this instanceof Scene)) return new Scene(gl, opts)
   opts = opts || {}
   this.gl = gl
   this.fov = opts.fov || Math.PI / 4
@@ -16,6 +19,7 @@ function Scene (gl, opts) {
   this.far = opts.far || 1000
   this.target = opts.target || [0, 0, 0]
   this.viewer = opts.viewer || [0, -10, 30]
+  this.background = opts.background || [0.0, 0.0, 0.0]
 }
 
 Scene.prototype.init = function () {
@@ -23,9 +27,10 @@ Scene.prototype.init = function () {
   if (!self._shapes) throw Error('Cannot initialize without shapes')
   this.frame = 0
   this.proj = mat4.create()
-  this.view = mat4.lookAt(mat4.create(), self.viewer, self.target, [0, 1, 0])
+  this.view = mat4.lookAt(mat4.create(), self.viewer, self.target, [0, 0, 1])
   this.eye = new Float32Array(3)
-  if (!self._shaders) self.shaders()
+  eye(this.view, this.eye)
+  if (!self._materials) self.materials()
   self.defaults()
 }
 
@@ -33,36 +38,50 @@ Scene.prototype.defaults = function () {
   var self = this
 
   _.forEach(self._shapes, function (shape) {
-    if (!shape.material) shape.material = 'flat'
+    if (!shape.material) shape.material = 'basic'
   })
 
-  var shader
+  var material
   _.forEach(self._shapes, function (shape) {
-    shader = self._shaders[shape.material]
-    console.log(shader.uniforms)
-    _.forEach(shader.uniforms, function (prop, index) {
-      if (!shape[prop]) shape[prop] = shader.defaults[index]
+    material = self._materials[shape.material]
+    _.forEach(material.uniforms, function (prop, index) {
+      if (shape[prop]) shape._material[prop] = shape[prop]
+      if (!shape[prop]) shape._material[prop] = material.defaults[index]
+    })
+  })
+
+  _.forEach(self._lights, function (light) {
+    _.defaults(light, {
+      color: [1.0, 1.0, 1.0],
+      brightness: 1,
+      attenuation: 0.5,
+      ambient: 1,
+      cutoff: 180,
+      target: [0, 0, -1],
+      exponent: 0.0
     })
   })
 }
 
-Scene.prototype.shaders = function (shaders) {
+Scene.prototype.materials = function (materials) {
   var self = this
 
-	if (!shaders) {
-		shaders = {
-			flat: {
+  console.log(glslify('./shaders/basic.frag'))
+
+	if (!materials) {
+		materials = {
+			basic: {
 	  		shader: Shader(self.gl,
-			    glslify('./shaders/flat.vert'),
-			    glslify('./shaders/flat.frag')
+			    glslify('./shaders/basic.vert'),
+			    glslify('./shaders/basic.frag').replace(/LIGHTTYPE/g, 'Light').replace(/MATERIALTYPE/g, 'Material')
 			  ),
-			  uniforms: ['color', 'fog', 'lit'],
-        defaults: [[0.6, 0.6, 0.6], true, true]
+			  uniforms: ['emissive', 'ambient', 'specular', 'diffuse', 'shininess', 'roughness'],
+        defaults: [[0.0, 0.0, 0.0], [0.2, 0.2, 0.2], [0.0, 0.0, 0.0], [0.8, 0.8, 0.8], 20.0, 0.7]
 		  }
 		}
 	} 
 
-	self._shaders = shaders
+	self._materials = materials
 }
 
 Scene.prototype.shapes = function (objects, styles) {
@@ -78,16 +97,41 @@ Scene.prototype.shapes = function (objects, styles) {
 
   var complex
   _.forEach(objects, function (object) {
+    if (!object.complex) throw Error('No simplicial complex specified for shape ' + object.id)
+    if (!object.move) throw Error('No move matrix specified for shape ' + object.id)
     complex = object.complex
+    complex = reindex(unindex(complex.positions, complex.cells))
     object.geometry = Geometry(self.gl)
     object.geometry.attr('position', complex.positions)
     object.geometry.attr('normal', normals.vertexNormals(complex.cells, complex.positions))
     object.geometry.faces(complex.cells)
     object.animate = mat4.create()
+    object.moveT = mat3.create()
+    object.animateT = mat3.create()
     object.render = true
+    object._material = {}
   })
 
   self._shapes = objects
+}
+
+Scene.prototype.lights = function (objects, styles) {
+  var self = this
+
+  var attr
+  _.forEach(objects, function (object) {
+    attr = _.find(styles, ['tag', '#' + object.id])
+    if (attr) _.assign(object, attr)
+    attr = _.find(styles, ['tag', '.' + object.class])
+    if (attr) _.assign(object, attr)
+  })
+
+  _.forEach(objects, function (object) {
+    if (!object.position) throw Error('No position vector specified for light ' + object.id)
+    object.enabled = true
+  })
+
+  self._lights = objects
 }
 
 Scene.prototype.draw = function () {
@@ -98,20 +142,29 @@ Scene.prototype.draw = function () {
   self.gl.viewport(0, 0, self.width, self.height)
   mat4.perspective(self.proj, self.fov, self.width / self.height, self.near, self.far)
 
+  self.gl.clearColor(self.background[0], self.background[1], self.background[2], 1)
+  self.gl.clear(self.gl.COLOR_BUFFER_BIT)
   self.gl.enable(self.gl.DEPTH_TEST)
 
   _.forEach(self._shapes, function (shape) {
     if (shape.render) {
-    	shape.shader = self._shaders[shape.material]
+      mat3.normalFromMat4(shape.moveT, shape.move)
+      mat3.normalFromMat4(shape.animateT, shape.animate)
+    	
+      shape.shader = self._materials[shape.material]
       shape.geometry.bind(shape.shader.shader)
       shape.shader.shader.uniforms.proj = self.proj
       shape.shader.shader.uniforms.view = self.view
       shape.shader.shader.uniforms.eye = self.eye
+      shape.shader.shader.uniforms.background = self.background
+      shape.shader.shader.uniforms.lights = self._lights
+
       shape.shader.shader.uniforms.move = shape.move
+      shape.shader.shader.uniforms.moveT = shape.moveT
       shape.shader.shader.uniforms.animate = shape.animate
-      _.forEach(shape.shader.uniforms, function (prop) {
-        shape.shader.shader.uniforms[prop] = shape[prop]
-      })
+      shape.shader.shader.uniforms.animateT = shape.animateT
+      shape.shader.shader.uniforms.material = shape._material
+      
       shape.geometry.draw(self.gl.TRIANGLES)
       shape.geometry.unbind()
     }
