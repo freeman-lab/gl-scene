@@ -66,14 +66,12 @@ Scene.prototype.defaults = function () {
 Scene.prototype.materials = function (materials) {
   var self = this
 
-  console.log(glslify('./shaders/basic.frag'))
-
 	if (!materials) {
 		materials = {
 			basic: {
 	  		shader: Shader(self.gl,
 			    glslify('./shaders/basic.vert'),
-			    glslify('./shaders/basic.frag').replace(/LIGHTTYPE/g, 'Light').replace(/MATERIALTYPE/g, 'Material')
+			    glslify('./shaders/basic.frag').replace(/LIGHTTYPE/g, 'BasicLight').replace(/MATERIALTYPE/g, 'BasicMaterial')
 			  ),
 			  uniforms: ['emissive', 'ambient', 'specular', 'diffuse', 'shininess', 'roughness'],
         defaults: [[0.0, 0.0, 0.0], [0.2, 0.2, 0.2], [0.0, 0.0, 0.0], [0.8, 0.8, 0.8], 20.0, 0.7]

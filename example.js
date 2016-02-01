@@ -25,7 +25,7 @@ var shapes = [
   {
     id: 'orange', class: 'sphere',
     complex: icosphere(4),
-    move: [2, 0, 0, 0, 0, 2, 0, 0, 0, 0, 2, 0, -5, -10, 2, 1]
+    move: [2, 0, 0, 0, 0, 2, 0, 0, 0, 0, 2, 0, -5, -5, 2, 1]
   },
   {
     id: 'pear', class: 'sphere',
@@ -48,7 +48,7 @@ var lights = [
   {id: 'point', position: [0, 0, 5, 1]}, 
   {id: 'pear', position: [0, 8, 3, 1]},
   {id: 'apple', position: [8, 0, 1, 1]},
-  {id: 'orange', position: [-5, -10, 2, 1]}
+  {id: 'orange', position: [-5, -5, 2, 1]}
 ]
 var opts = [
   {tag: '#point', color: [1, 1, 1], brightness: 1.0, ambient: 0.1, attenuation: 0.01},

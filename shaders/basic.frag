@@ -6,8 +6,8 @@ uniform vec3 eye;
 uniform float fogged;
 
 #pragma glslify: Lighting = require('glsl-basic-lighting')
-//#pragma glslify: Material = require('glsl-basic-material')
-//#pragma glslify: Light = require('glsl-basic-light')
+//#pragma glslify: BasicMaterial = require('glsl-basic-material')
+//#pragma glslify: BasicLight = require('glsl-basic-light')
 
 uniform LIGHTTYPE lights[4];
 uniform MATERIALTYPE material;
