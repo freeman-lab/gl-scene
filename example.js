@@ -6,10 +6,13 @@ var icosphere = require('icosphere')
 var extrude = require('extrude')
 
 var canvas = document.body.appendChild(document.createElement('canvas'))
-window.addEventListener('resize', fit(canvas), false)
-var gl = context(canvas, tick)
+var gl = context(canvas)
+fit(canvas)
 
-var scene = require('./index.js')(gl, {background: [0.02, 0.02, 0.02]})
+var scene = require('./index.js')(gl, {
+  viewer: [0, -5, 20], 
+  background: [0.02, 0.02, 0.02]
+})
 
 var shapes = [
   {
@@ -25,34 +28,23 @@ var shapes = [
   {
     id: 'mars', class: 'planet',
     complex: icosphere(4),
-    model: [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 8, 0, 1]
+    model: [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 6, 0, 1]
   },
+  {
+    id: 'neptune', class: 'planet',
+    complex: icosphere(4),
+    model: [1.25, 0, 0, 0, 0, 1.25, 0, 0, 0, 0, 1.25, 0, -4.8, -4.8, 0, 1]
+  }
 ]
 
 var styles = [
-  {tag: '#sun', emissive: [0.9, 0.9, 0.0]},
-  {tag: '#earth', emissive: [0.0, 0.5, 0.0]},
-  {tag: '#mars', emissive: [0.3, 0.0, 0.0]},
-  {tag: '.planet', diffuse: [0.1, 0.1, 0.1]}
+  {tag: '#sun', emissive: [0.9, 0.9, 0]},
+  {tag: '#earth', ambient: [0.0, 0.4, 0.2]},
+  {tag: '#mars', ambient: [0.6, 0.1, 0.1]},
+  {tag: '#neptune', ambient: [0.0, 0.2, 0.4]},
+  {tag: '.planet', diffuse: [0.9, 0.9, 0.9]}
 ]
 
 scene.shapes(shapes, styles)
-
-var lights = [
-  {id: 'sun', position: [0, 0, 0, 1]}
-]
-var styles = [
-  {tag: '#sun', color: [0.8, 0.8, 0.0], brightness: 20.0, ambient: 0.05, attenuation: 0.01}
-]
-
-scene.lights(lights, styles)
 scene.init()
 scene.draw()
-
-var camera = orbit(canvas)
-
-function tick () { 
-  camera.tick()
-  scene.update(camera)
-  scene.draw()
-}

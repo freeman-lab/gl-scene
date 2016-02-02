@@ -26,22 +26,31 @@ npm run demo
 
 ## example
 
-First construct a scene using a `webgl` context.
+First get yourself a `webgl` context. There are many ways to do this, but here's an easy one.
 
 ```javascript
 var canvas = document.body.appendChild(document.createElement('canvas'))
 var gl = require('gl-context')(canvas)
-var scene = require('gl-scene')(gl)
+require('canvas-fit')(canvas)
 ```
 
-A scene requires a list of shapes. It can additionally include lights and custom materials. Here we'll make a simple scene consisting of three spheres, representing planets. We assign an `id` a `class` to each shape so we can use them to style later, and we specify a 4x4 `model` matrix, which controls rotation, translation, and scale.
+Now create the scene, passing options for background color and viewer position
+
+```javascript
+var scene = require('gl-scene')(gl, {
+  viewer: [0, -5, 20], 
+  background: [0.02, 0.02, 0.02]
+})
+```
+
+A scene requires a list of shapes. It can additionally include lights and custom materials. We'll make a simple scene consisting of four spheres, representing three planets and a sun. We can set an `id` and `class` for styling later, and we specify a 4x4 `model` matrix, which controls rotation, translation, and scale.
 
 ```javascript
 var icosphere = require('icosphere')
 
 var shapes = [
   {
-    id: 'sun',
+    id: 'sun', class: 'star'
     complex: icosphere(4),
     model: [2, 0, 0, 0, 0, 2, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1]
   },
@@ -53,56 +62,81 @@ var shapes = [
   {
     id: 'mars', class: 'planet',
     complex: icosphere(4),
-    model: [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 8, 0, 1]
+    model: [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 6, 0, 1]
   },
+  {
+    id: 'neptune', class: 'planet',
+    complex: icosphere(4),
+    model: [1.25, 0, 0, 0, 0, 1.25, 0, 0, 0, 0, 1.25, 0, -4.8, -4.8, 0, 1]
+  }
 ]
 ```
 
-We'll now define styles for these shapes by mapping from `id` or `class` to material properties. We'll put a nice emmisive color on all shapes, and add a diffuse component for the planets.
+We can set styles by mapping `id` or `class` to material properties. We'll add a diffuse component to all planets, a different ambient color to each one, and an emissive color on the sun.
 
 ```javascript
 var styles = [
-  {tag: '#sun', emissive: [0.9, 0.9, 0.0]},
-  {tag: '#earth', emissive: [0.0, 0.2, 0.5]},
-  {tag: '#mars', emissive: [0.3, 0.0, 0.0]},
-  {tag: '.planet', diffuse: [0.1, 0.1, 0.1]}
+  {tag: '#sun', emissive: [0.9, 0.9, 0]},
+  {tag: '#earth', ambient: [0.0, 0.4, 0.2]},
+  {tag: '#mars', ambient: [0.6, 0.1, 0.1]},
+  {tag: '#neptune', ambient: [0.0, 0.2, 0.4]},
+  {tag: '.planet', diffuse: [0.9, 0.9, 0.9]}
 ]
 ```
 
-You can now add these shapes to the scene.
+We can add these shapes, with styles, to our scene, initialize, and draw!
 
 ```javascript
 scene.shapes(shapes, styles)
-```
-
-Let's also add a light: a bright yellow one to represent the sun! Specify a list with an `id` and 4x1 `position` for each light.
-
-```javascript
-var lights = [
-  {id: 'sun', position: [0, 0, 0, 1]}
-]
-```
-
-And then set styles. We'll make it bright yellow, with only weak ambient light.
-
-```javascript
-var styles = [
-  {tag: '#sun', color: [0.8, 0.8, 0.0], brightness: 20.0, ambient: 0.05, attenuation: 0.01}
-]
-```
-
-Now add the lights to the scene
-
-```javascript
-scene.lights(lights, styles)
-```
-
-Then initialize and draw!
-
-```javascript
 scene.init()
 scene.draw()
 ```
+
+It should look like:
+
+![example-0](pngs/example-stage-0.png)
+
+We didn't specify any lights, so we got a default white light above the origin. Let's make our own: a bright yellow light at the origin to represent the sun! Specify an `id` and 4x1 `position`.
+
+```javascript
+var lights = [
+  {id: 'sun', position: [0, 0, 2, 1]}
+]
+```
+
+Set styles by making it bright yellow and moderately ambient.
+
+```javascript
+var styles = [
+  {tag: '#sun', color: [0.9, 0.9, 0.0], brightness: 2.5, ambient: 0.5, attenuation: 0.01}
+]
+```
+
+Add it to the scene, reinitialize, and draw.
+
+```javascript
+scene.lights(lights, styles)
+scene.init()
+scene.draw()
+```
+
+And you'll see:
+
+![example-1](pngs/example-stage-1.png)
+
+Finally, let's add a simple animation, where the sun grows and shrinks, and the light gets brighter and dimmer. You can `select` both shapes and lights and then use functions like `move` and `style` to dynamically change their properties.
+
+```javascript
+setInterval(function () {
+  var d = Math.sin(scene.frame / 30)
+  scene.select('#sun').move(function (m) {mat4.scale(m, mat4.create(), [2 + d, 2 + d, 2 + d])})
+  scene.select('light #sun').style({brightness: 2.5 + d * 1.5})
+  scene.draw()
+}, 10)
+```
+Fun!
+
+![example-2](gifs/example-stage-2.gif)
 
 ## methods
 

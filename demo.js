@@ -63,7 +63,6 @@ var opts = [
 ]
 
 scene.lights(lights, opts)
-
 scene.init()
 
 var camera = orbit(canvas)
