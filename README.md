@@ -201,3 +201,4 @@ scene.find('shape #earth').toggleClass('planet')
 
 - Make selection work on lists via a `selectAll` operator
 - Support multiple classes per element
+- Tests!
