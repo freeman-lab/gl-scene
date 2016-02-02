@@ -1,6 +1,6 @@
 # gl-scene
 
-Assemble simple 3d scenes using [`stack.gl`](http://stack.gl) components. The goal of this module is to make it easy to assemble shapes and lights into a scene, at a slightly higher level of abstraction, while maintaining full flexibility and composability with the `stack.gl` ecosystem. You can think of this module as a wrapper for `gl-geometry`, `gl-shader`, and `gl-mat4`, with a simple selector-based system for controlling appearences.
+Assemble simple 3d scenes using [`stack.gl`](http://stack.gl) components. The goal of this module is to make it easy to assemble shapes and lights into a scene, at a slightly higher level of abstraction, while maintaining full flexibility and composability with the `stack.gl` ecosystem. You can think of this module as a wrapper for `gl-geometry`, `gl-shader`, and `gl-mat4`, with an easy selector system for controlling appearences.
 
 ### install
 
@@ -10,99 +10,113 @@ Add to your project with
 npm install gl-scene --save
 ```
 
-View the demo by cloning this repo then calling
+See a simple example by cloning this repo then calling
 
 ```javascript
 npm start
 ```
 
-### example
-
-First construct the scene using a `webgl` context.
+And see a more complex example with
 
 ```javascript
-var context = require('gl-now')()
-var scene = require('gl-scene')(context.gl)
+npm run demo
 ```
 
-A scene consists of shapes and lights. Here, we'll just make two translated spheres.
+### example
+
+First construct a scene using a `webgl` context.
 
 ```javascript
-var mat4 = require('gl-mat4')
+var canvas = document.body.appendChild(document.createElement('canvas'))
+var gl = require('gl-context')(canvas)
+var scene = require('gl-scene')(gl)
+```
+
+A scene requires a list of shapes. It can additionally include lights and materials. Here we'll make a simple scene consisting of three spheres, representing planets. We assign an `id` a `class` to each shape so we can use them to style later, and we specify a 4x4 `model` matrix, which controls rotation, translation, and scale.
+
+```javascript
 var icosphere = require('icosphere')
 
 var shapes = [
-	{
-		id: 'apple',
-		class: 'sphere',
-		complex: icosphere(),
-		move: mat4.translate(mat4.create(), mat4.create(), [5, 0, 0])
-	},
-	{
-		id: 'orange',
-		class: 'sphere',
-		complex: icosphere(),
-		move: mat4.translate(mat4.create(), mat4.create(), [0, 5, 5])
-	}
+  {
+    id: 'sun',
+    complex: icosphere(4),
+    model: [2, 0, 0, 0, 0, 2, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1]
+  },
+  {
+    id: 'earth', class: 'planet',
+    complex: icosphere(4),
+    model: [1.5, 0, 0, 0, 0, 1.5, 0, 0, 0, 0, 1.5, 0, 6, 0, 0, 1]
+  },
+  {
+    id: 'mars', class: 'planet',
+    complex: icosphere(4),
+    model: [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 8, 0, 1]
+  },
 ]
 ```
 
-Now define style options for these shapes by mapping from `id` or `class` to options.
+Now define styles for these shapes by mapping from `id` or `class` to material properties. We'll put a nice emmisive light source on all shapes, and add a diffuse component for the planets.
 
 ```javascript
-var opts = {
-	{
-		tag: '.sphere',
-		shader: 'flat'
-	},
-	{
-		tag: '#apple'
-		color: [0.0, 0.6, 0.0]
-	},
-	{
-		tag: '#orange'
-		color: [0.5, 0.5, 0.0]
-	}
-}
+var styles = [
+  {tag: '#sun', emissive: [0.9, 0.9, 0.0]},
+  {tag: '#earth', emissive: [0.0, 0.2, 0.5]},
+  {tag: '#mars', emissive: [0.3, 0.0, 0.0]},
+  {tag: '.planet', diffuse: [0.1, 0.1, 0.1]}
+]
 ```
 
-Add these shapes to the scene, initialize, and draw!
+You can now add these shapes to the scene.
 
 ```javascript
-scene.shapes(shapes, opts)
+scene.shapes(shapes, styles)
+```
+
+Let's also add a light: a bright yellow one to represent the sun. Specify a list with an `id` and 4x1 `position` for each light.
+
+```javascript
+var lights = [
+  {id: 'sun', position: [0, 0, 0, 1]}
+]
+```
+
+And then set styles. We'll make it bright yellow, with only weak ambient light.
+
+```javascript
+var styles = [
+  {tag: '#sun', color: [0.8, 0.8, 0.0], brightness: 20.0, ambient: 0.05, attenuation: 0.01}
+]
+```
+
+Now add the lights to the scene
+
+```javascript
+scene.lights(lights, styles)
+```
+
+Then initialize and draw!
+
+```javascript
 scene.init()
 scene.draw()
-```
-
-If you want a dynamic camera, make on, and then call `update` and `draw` on your render event
-
-```javascript
-var camera = require('canvas-orbit-camera')
-
-context.on('gl-render', function (t) {
-	camera.tick()
-	scene.update(camera)
-	scene.draw()	
-})
 ```
 
 ### core components
 
 ##### `shapes`
 
-Specify a list of shapes each with an `id`, `class`, `complex`, and `move`
+Specify a list of shapes each with an `id`, `class`, `complex`, `model`, and 'material'.
 Specify a list of style options each with a tag `#id` or `.class` and a set of options.
 
 ##### `lights`
 
-Specify a list of lights each with an `id`, `class`, and `move`.
+Specify a list of lights each with an `id`, `class`, `position`.
 Specify a list of style options each with a tag `#id` or `.class` and a set of options.
 
-##### `shaders`
+##### `materials`
 
-Several default shaders (corresponding to different materials) are included, and for many simple scenes you won't need to work with them directly, but it's easy to pass your own shaders as well.
-
-TODO explain how
+A basic `material` -- a shader and a set of attributes -- is included, and for many simple scenes it might be enough, but it's easy to build scenes with your own materials and shaders.
 
 ### methods
 
@@ -122,7 +136,7 @@ Add a list of `lights` to the scene, alongside a set of `styles`.
 
 ##### `scene.materials(materials)`
 
-Specify a list of materials to use.
+Specify a list of `materials` to use.
 
 #### rendering
 
@@ -140,10 +154,65 @@ Draw the scene to the `webgl` context.
 
 #### manipulation
 
-##### `scene.hide(tag)`
+Manipulation is based on first selecting an element of interest (shape or light) and then adjusting its properties.
 
-Hide all elements that match the given tag. Tag should being with `#` to specify an `id` or `.` to specify a `class`. A string will otherwise be treated as an `id`.
+TOOD Generalize all of these to work on arrays via a `selectAll` operator.
+TODO Support multiple classes per element.
 
-##### `scene.show(tag)`
+##### `scene.select(selector)`
 
-Hide all elements that match the given tag. Tag should being with `#` to specify an `id` or `.` to specify a `class`. A string will otherwise be treated as an `id`.
+Returns the first `element` that matches the given tag. Selector should be of the form:
+- `#id`
+- `.class`
+- `shape #id` 
+- `shape .class`
+- `light #id`
+- `light .class`
+
+If `shape` or `light` is unspecified, will first look for a matching shape, and then a matching light.
+
+#### `element.move(func)`
+
+Move an element by providing a function `func` that should take as input a `model` matrix (for shapes) or a `position` vector (for lights).
+
+```javascript
+scene.find('#earth').move(function (model) {mat4.translate(model, model, [0, 5, 0])})
+```
+
+##### `element.hide()`
+
+Hide the given element. For a shape, will remove it from the scene. For a light, will remove its effects.
+
+##### `element.show()`
+
+Show the given element.
+
+##### `element.toggle()`
+
+Show or hide the given element depending on its current state.
+
+##### `element.style({name: value})`
+
+Set one or more style properties on the element.
+
+```javascript
+scene.find('#earth').style({emissive: [0.6, 0.2, 0.1]})
+```
+
+##### `element.classed(name, value)`
+
+Set class `name` on the element to `value`, which should be truthy.
+
+```javascript
+scene.find('#earth').classed('planet', false)
+```
+
+##### `element.toggleClass(name)`
+
+Add or remove class `name` on the given element depending on its current state.
+
+```javascript
+scene.find('#earth').toggleClass('planet')
+```
+
+
