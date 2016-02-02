@@ -148,15 +148,7 @@ TODO Support multiple classes per element.
 
 #### `scene.select(selector)`
 
-Returns the first `element` that matches the given tag. Selector should be of the form:
-- `#id`
-- `.class`
-- `shape #id` 
-- `shape .class`
-- `light #id`
-- `light .class`
-
-If `shape` or `light` is unspecified, will first look for a matching shape, and then a matching light.
+Returns the first `element` that matches the given tag. Selector should be of the form: `#id`, `.class`, `shape #id`, `shape .class`, `light #id`, or `light .class`. If `shape` or `light` is unspecified, will first look for a matching shape, and then a matching light.
 
 
 #### `element.hide()`
