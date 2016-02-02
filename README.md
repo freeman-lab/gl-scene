@@ -140,7 +140,7 @@ Draw the scene to the `webgl` context.
 
 ### manipulation
 
-Manipulation is based on first selecting an element of interest (shape or light) and then adjusting its properties.
+All manipulation works by first selecting an element -- a shape or a light -- and then changing its properties.
 
 TOOD Generalize all of these to work on arrays via a `selectAll` operator.
 
