@@ -156,13 +156,6 @@ Returns the first `element` that matches the given tag. Selector should be of th
 
 If `shape` or `light` is unspecified, will first look for a matching shape, and then a matching light.
 
-#### `element.move(func)`
-
-Move an element by providing a function `func` that should take as input a `model` matrix (for shapes) or a `position` vector (for lights).
-
-```javascript
-scene.find('#earth').move(function (model) {mat4.translate(model, model, [0, 5, 0])})
-```
 
 #### `element.hide()`
 
@@ -175,6 +168,14 @@ Show the given element.
 #### `element.toggle()`
 
 Show or hide the given element depending on its current state.
+
+#### `element.move(func)`
+
+Move an element by providing a function `func` that should take as input a `model` matrix (for shapes) or a `position` vector (for lights).
+
+```javascript
+scene.find('#earth').move(function (model) {mat4.translate(model, model, [0, 5, 0])})
+```
 
 #### `element.style({name: value})`
 
