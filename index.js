@@ -30,20 +30,36 @@ Scene.prototype.init = function () {
   this.view = mat4.lookAt(mat4.create(), self.viewer, self.target, [0, 1, 0])
   this.eye = new Float32Array(3)
   eye(this.view, this.eye)
+  this.lighting = {}
+  if (!self._lights) self.lights()
   if (!self._materials) self.materials()
-  self.defaults()
+  self._setDefaults()
+  this.ready = true
 }
 
-Scene.prototype.defaults = function () {
+Scene.prototype._setDefaults = function () {
   var self = this
 
-  var material
   _.forEach(self._shapes, function (shape) {
-    material = self._materials[shape.material]
-    _.forEach(material.uniforms, function (prop, index) {
-      if (!shape.uniforms[prop]) shape.uniforms[prop] = material.defaults[index]
+    shape.setDefaults(self._materials[shape.material].defaults)
+  })
+
+  _.forEach(self._lights, function (light) {
+    light.setDefaults({
+      color: [1.0, 1.0, 1.0],
+      attenuation: 0.05,
+      brightness: 3.0,
+      ambient: 1.0,
+      cutoff: 180,
+      target: [0, 0, -1],
+      exponent: 0.0
     })
   })
+}
+
+Scene.prototype._reset = function () {
+  this.ready = false
+  delete this._materials
 }
 
 Scene.prototype.materials = function (materials) {
@@ -59,8 +75,14 @@ Scene.prototype.materials = function (materials) {
             .replace(/LIGHTTYPE/g, 'BasicLight')
             .replace(/MATERIALTYPE/g, 'BasicMaterial')
 			  ),
-			  uniforms: ['emissive', 'ambient', 'specular', 'diffuse', 'shininess', 'roughness'],
-        defaults: [[0.0, 0.0, 0.0], [0.2, 0.2, 0.2], [0.0, 0.0, 0.0], [0.8, 0.8, 0.8], 20.0, 0.7]
+        defaults: {
+          emissive: [0.0, 0.0, 0.0], 
+          ambient: [0.2, 0.2, 0.2], 
+          specular: [0.0, 0.0, 0.0], 
+          diffuse: [0.8, 0.8, 0.8], 
+          shininess: 20.0,
+          roughness: 0.7
+        }
 		  }
 		}
 	} 
@@ -70,6 +92,10 @@ Scene.prototype.materials = function (materials) {
 
 Scene.prototype.shapes = function (objects, styles) {
   var self = this
+  styles = styles || {}
+  self._reset()
+
+  Shape.prototype.styles = styles
 
   var shapes = []
   _.forEach(objects, function (object) {
@@ -79,13 +105,12 @@ Scene.prototype.shapes = function (objects, styles) {
       class: object.class,
       complex: object.complex,
       model: object.model,
-      material: object.material,
-      styles: styles
+      material: object.material
     }))
   })
 
   _.forEach(shapes, function (shape) {
-    shape.set()
+    shape.setStyles()
   })
 
   self._shapes = shapes
@@ -93,19 +118,28 @@ Scene.prototype.shapes = function (objects, styles) {
 
 Scene.prototype.lights = function (objects, styles) {
   var self = this
+  styles = styles || {}
+  self._reset()
+
+  Light.prototype.styles = styles
+
+  if (!objects) {
+    objects = [
+      {id: 'center', position: [0, 0, 5, 1]}
+    ]
+  }
 
   var lights = []
   _.forEach(objects, function (object) {
     lights.push(Light({
       id: object.id,
       class: object.class,
-      position: object.position,
-      styles: styles
+      position: object.position
     }))
   })
 
   _.forEach(lights, function (light) {
-    light.set()
+    light.setStyles()
   })
 
   self._lights = lights
@@ -113,44 +147,49 @@ Scene.prototype.lights = function (objects, styles) {
 
 Scene.prototype.draw = function () {
   var self = this
+  if (!self.ready) throw Error('Scene must be initialized before drawing!')
 
   self.width = self.gl.drawingBufferWidth
   self.height = self.gl.drawingBufferHeight
   self.gl.viewport(0, 0, self.width, self.height)
   mat4.perspective(self.proj, self.fov, self.width / self.height, self.near, self.far)
 
-  self.gl.clearColor(self.background[0], self.background[1], self.background[2], 1)
-  self.gl.clear(self.gl.COLOR_BUFFER_BIT)
   self.gl.enable(self.gl.DEPTH_TEST)
+  self.gl.clearColor(self.background[0], self.background[1], self.background[2], 1)
+  self.gl.clear(self.gl.COLOR_BUFFER_BIT | self.gl.DEPTH_BUFFER_BIT)
+  
+  self.lighting = _.map(self._lights, 'uniforms')
+  _.merge(self.lighting, _.map(self._lights, 'attributes'))
 
   _.forEach(self._shapes, function (shape) {
-    if (shape.enabled) {
-      mat3.normalFromMat4(shape.modelT, shape.model)
-      mat3.normalFromMat4(shape.animateT, shape.animate)
+    if (shape.attributes.enabled) {
+      mat3.normalFromMat4(shape.attributes.model_ti, shape.attributes.model)
+      mat3.normalFromMat4(shape.attributes.animate_ti, shape.attributes.animate)
     	
       shape.shader = self._materials[shape.material]
-      shape.geometry.bind(shape.shader.shader)
+      shape.attributes.geometry.bind(shape.shader.shader)
       shape.shader.shader.uniforms.proj = self.proj
       shape.shader.shader.uniforms.view = self.view
       shape.shader.shader.uniforms.eye = self.eye
-      shape.shader.shader.uniforms.lights = self._lights
+      shape.shader.shader.uniforms.lights = self.lighting
 
-      shape.shader.shader.uniforms.model = shape.model
-      shape.shader.shader.uniforms.modelT = shape.modelT
-      shape.shader.shader.uniforms.animate = shape.animate
-      shape.shader.shader.uniforms.animateT = shape.animateT
+      shape.shader.shader.uniforms.model = shape.attributes.model
+      shape.shader.shader.uniforms.model_ti = shape.attributes.model_ti
+      shape.shader.shader.uniforms.animate = shape.attributes.animate
+      shape.shader.shader.uniforms.animate_ti = shape.attributes.animate_ti
       shape.shader.shader.uniforms.material = shape.uniforms
       
-      shape.geometry.draw(self.gl.TRIANGLES)
-      shape.geometry.unbind()
+      shape.attributes.geometry.draw(self.gl.TRIANGLES)
+      shape.attributes.geometry.unbind()
     }
   })
+
+  this.frame += 1
 }
 
 Scene.prototype.update = function (camera) {
   camera.view(this.view)
   eye(this.view, this.eye)
-  this.frame += 1
 }
 
 Scene.prototype.select = function (selector) {
