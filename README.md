@@ -2,7 +2,7 @@
 
 Assemble simple 3d scenes using [`stack.gl`](http://stack.gl) components. The goal of this module is to make it easy to assemble shapes and lights into a scene, at a slightly higher level of abstraction, while maintaining full flexibility and composability with the `stack.gl` ecosystem. You can think of this module as a wrapper for `gl-geometry`, `gl-shader`, and `gl-mat4`, with an easy selector system for controlling appearences.
 
-### install
+## install
 
 Add to your project with
 
@@ -22,7 +22,7 @@ And see a more complex example with
 npm run demo
 ```
 
-### example
+## example
 
 First construct a scene using a `webgl` context.
 
@@ -102,41 +102,41 @@ scene.init()
 scene.draw()
 ```
 
-### methods
+## methods
 
-#### initialization
+### initialization
 
-##### `scene(gl, opts)`
+#### `scene(gl, opts)`
 
 Construct a scene by providing a `webgl` context. [expand]
 
-##### `scene.shapes(shapes, styles)`
+#### `scene.shapes(shapes, styles)`
 
 Add a list of `shapes` to the scene, using a set of `styles`. [expand]
 
-##### `scene.lights(lights, styles)`
+#### `scene.lights(lights, styles)`
 
 Add a list of `lights` to the scene, alongside a set of `styles`. [expand]
 
-##### `scene.materials(materials)`
+#### `scene.materials(materials)`
 
 Specify a list of `materials` to use. [expand]
 
-#### rendering
+### rendering
 
-##### `scene.init()`
+#### `scene.init()`
 
 Initialize the scene, check that required properties are defined, and replace missing properties with defaults where possible, as follows. For shapes without a material, the material will be `flat`. If a shape has undefined material properties, they will be replaced with the defaults.
 
-##### `scene.update(camera)`
+#### `scene.update(camera)`
 
 Update the scene's projection and view matrices from the provided `camera`, which must have a `view` method. For examples see: `canvas-orbit-camera`
 
-##### `scene.draw()`
+#### `scene.draw()`
 
 Draw the scene to the `webgl` context.
 
-#### manipulation
+### manipulation
 
 Manipulation is based on first selecting an element of interest (shape or light) and then adjusting its properties.
 
@@ -144,7 +144,7 @@ TOOD Generalize all of these to work on arrays via a `selectAll` operator.
 
 TODO Support multiple classes per element.
 
-##### `scene.select(selector)`
+#### `scene.select(selector)`
 
 Returns the first `element` that matches the given tag. Selector should be of the form:
 - `#id`
@@ -164,19 +164,19 @@ Move an element by providing a function `func` that should take as input a `mode
 scene.find('#earth').move(function (model) {mat4.translate(model, model, [0, 5, 0])})
 ```
 
-##### `element.hide()`
+#### `element.hide()`
 
 Hide the given element. For a shape, will remove it from the scene. For a light, will remove its effects.
 
-##### `element.show()`
+#### `element.show()`
 
 Show the given element.
 
-##### `element.toggle()`
+#### `element.toggle()`
 
 Show or hide the given element depending on its current state.
 
-##### `element.style({name: value})`
+#### `element.style({name: value})`
 
 Set one or more style properties on the element.
 
@@ -184,7 +184,7 @@ Set one or more style properties on the element.
 scene.find('#earth').style({emissive: [0.6, 0.2, 0.1]})
 ```
 
-##### `element.classed(name, value)`
+#### `element.classed(name, value)`
 
 Set class `name` on the element to `value`, which should be truthy.
 
@@ -192,7 +192,7 @@ Set class `name` on the element to `value`, which should be truthy.
 scene.find('#earth').classed('planet', false)
 ```
 
-##### `element.toggleClass(name)`
+#### `element.toggleClass(name)`
 
 Add or remove class `name` on the given element depending on its current state.
 
