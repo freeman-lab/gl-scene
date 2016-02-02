@@ -34,7 +34,7 @@ var gl = require('gl-context')(canvas)
 var scene = require('gl-scene')(gl)
 ```
 
-A scene requires a list of shapes. It can additionally include lights and materials. Here we'll make a simple scene consisting of three spheres, representing planets. We assign an `id` a `class` to each shape so we can use them to style later, and we specify a 4x4 `model` matrix, which controls rotation, translation, and scale.
+A scene requires a list of shapes. It can additionally include lights and custom materials. Here we'll make a simple scene consisting of three spheres, representing planets. We assign an `id` a `class` to each shape so we can use them to style later, and we specify a 4x4 `model` matrix, which controls rotation, translation, and scale.
 
 ```javascript
 var icosphere = require('icosphere')
