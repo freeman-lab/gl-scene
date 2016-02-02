@@ -142,10 +142,6 @@ Draw the scene to the `webgl` context.
 
 All manipulation works by first selecting an element -- a shape or a light -- and then changing its properties.
 
-TOOD Generalize all of these to work on arrays via a `selectAll` operator.
-
-TODO Support multiple classes per element.
-
 #### `scene.select(selector)`
 
 Returns the first `element` that matches the given tag. Selector should be of the form: `#id`, `.class`, `shape #id`, `shape .class`, `light #id`, or `light .class`. If `shape` or `light` is unspecified, will first look for a matching shape, and then a matching light.
@@ -201,4 +197,7 @@ Add or remove class `name` on the given element depending on its current state.
 scene.find('shape #earth').toggleClass('planet')
 ```
 
+## TODO
 
+- Make selection work on lists via a `selectAll` operator
+- Support multiple classes per element
