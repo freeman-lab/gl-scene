@@ -165,7 +165,7 @@ Show or hide the given element depending on its current state.
 
 #### `element.move(func)`
 
-Move an element by providing a function `func` that should take as input a `model` matrix (for shapes) or a `position` vector (for lights).
+Move an element by providing a function `func` that should take as input a `model` matrix (for shapes) or a `position` vector (for lights), and modify it in place.
 
 ```javascript
 scene.find('shape #earth').move(function (model) {mat4.translate(model, model, [0, 5, 0])})
