@@ -169,6 +169,8 @@ Move an element by providing a function `func` that should take as input a `mode
 
 ```javascript
 scene.find('shape #earth').move(function (model) {mat4.translate(model, model, [0, 5, 0])})
+```
+```javascript
 scene.find('light #sun').move(function (position) {position[1] += 5})
 ```
 
@@ -178,6 +180,8 @@ Set one or more style properties on the element.
 
 ```javascript
 scene.find('shape #earth').style({emissive: [0.6, 0.2, 0.1]})
+```
+```javascript
 scene.find('light #sun').style({color: [0.5, 0.5, 0.5]})
 ```
 
