@@ -153,11 +153,11 @@ Returns the first `element` that matches the given tag. Selector should be of th
 
 #### `element.hide()`
 
-Hide the given element. For a shape, will remove it from the scene. For a light, will remove its effects.
+Hide the given element. For a shape, will remove it from the scene. For a light, will remove its effect on the scene.
 
 #### `element.show()`
 
-Show the given element.
+Show the given element. For a shape, will add it back to the scene. For a light, will include its effect on the scene.
 
 #### `element.toggle()`
 
@@ -168,7 +168,8 @@ Show or hide the given element depending on its current state.
 Move an element by providing a function `func` that should take as input a `model` matrix (for shapes) or a `position` vector (for lights).
 
 ```javascript
-scene.find('#earth').move(function (model) {mat4.translate(model, model, [0, 5, 0])})
+scene.find('shape #earth').move(function (model) {mat4.translate(model, model, [0, 5, 0])})
+scene.find('light #sun').move(function (position) {position[1] += 5})
 ```
 
 #### `element.style({name: value})`
@@ -176,7 +177,8 @@ scene.find('#earth').move(function (model) {mat4.translate(model, model, [0, 5, 
 Set one or more style properties on the element.
 
 ```javascript
-scene.find('#earth').style({emissive: [0.6, 0.2, 0.1]})
+scene.find('shape #earth').style({emissive: [0.6, 0.2, 0.1]})
+scene.find('light #sun').style({color: [0.5, 0.5, 0.5]})
 ```
 
 #### `element.classed(name, value)`
@@ -184,7 +186,7 @@ scene.find('#earth').style({emissive: [0.6, 0.2, 0.1]})
 Set class `name` on the element to `value`, which should be truthy.
 
 ```javascript
-scene.find('#earth').classed('planet', false)
+scene.find('shape #earth').classed('planet', false)
 ```
 
 #### `element.toggleClass(name)`
@@ -192,7 +194,7 @@ scene.find('#earth').classed('planet', false)
 Add or remove class `name` on the given element depending on its current state.
 
 ```javascript
-scene.find('#earth').toggleClass('planet')
+scene.find('shape #earth').toggleClass('planet')
 ```
 
 
