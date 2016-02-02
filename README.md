@@ -56,7 +56,7 @@ var shapes = [
 ]
 ```
 
-Now define styles for these shapes by mapping from `id` or `class` to material properties. We'll put a nice emmisive light source on all shapes, and add a diffuse component for the planets.
+We'll now define styles for these shapes by mapping from `id` or `class` to material properties. We'll put a nice emmisive color on all shapes, and add a diffuse component for the planets.
 
 ```javascript
 var styles = [
@@ -73,7 +73,7 @@ You can now add these shapes to the scene.
 scene.shapes(shapes, styles)
 ```
 
-Let's also add a light: a bright yellow one to represent the sun. Specify a list with an `id` and 4x1 `position` for each light.
+Let's also add a light: a bright yellow one to represent the sun! Specify a list with an `id` and 4x1 `position` for each light.
 
 ```javascript
 var lights = [
@@ -102,41 +102,25 @@ scene.init()
 scene.draw()
 ```
 
-### core components
-
-##### `shapes`
-
-Specify a list of shapes each with an `id`, `class`, `complex`, `model`, and 'material'.
-Specify a list of style options each with a tag `#id` or `.class` and a set of options.
-
-##### `lights`
-
-Specify a list of lights each with an `id`, `class`, `position`.
-Specify a list of style options each with a tag `#id` or `.class` and a set of options.
-
-##### `materials`
-
-A basic `material` -- a shader and a set of attributes -- is included, and for many simple scenes it might be enough, but it's easy to build scenes with your own materials and shaders.
-
 ### methods
 
 #### initialization
 
 ##### `scene(gl, opts)`
 
-Construct a scene by providing a `webgl` context.
+Construct a scene by providing a `webgl` context. [expand]
 
 ##### `scene.shapes(shapes, styles)`
 
-Add a list of `shapes` to the scene, using a set of `styles`.
+Add a list of `shapes` to the scene, using a set of `styles`. [expand]
 
 ##### `scene.lights(lights, styles)`
 
-Add a list of `lights` to the scene, alongside a set of `styles`.
+Add a list of `lights` to the scene, alongside a set of `styles`. [expand]
 
 ##### `scene.materials(materials)`
 
-Specify a list of `materials` to use.
+Specify a list of `materials` to use. [expand]
 
 #### rendering
 
@@ -157,6 +141,7 @@ Draw the scene to the `webgl` context.
 Manipulation is based on first selecting an element of interest (shape or light) and then adjusting its properties.
 
 TOOD Generalize all of these to work on arrays via a `selectAll` operator.
+
 TODO Support multiple classes per element.
 
 ##### `scene.select(selector)`
