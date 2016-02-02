@@ -1,13 +1,13 @@
 var Shader = require('gl-shader')
 var Geometry = require('gl-geometry')
+var Shape = require('./components/shape.js')
+var Light = require('./components/light.js')
 var mat4 = require('gl-mat4')
 var mat3 = require('gl-mat3')
 var eye = require('eye-vector')
 var normals = require('normals')
 var glslify = require('glslify')
 var distance = require('euclidean-distance')
-var reindex = require('mesh-reindex')
-var unindex = require('unindex-mesh')
 var _ = require('lodash')
 
 function Scene (gl, opts) {
@@ -27,7 +27,7 @@ Scene.prototype.init = function () {
   if (!self._shapes) throw Error('Cannot initialize without shapes')
   this.frame = 0
   this.proj = mat4.create()
-  this.view = mat4.lookAt(mat4.create(), self.viewer, self.target, [0, 0, 1])
+  this.view = mat4.lookAt(mat4.create(), self.viewer, self.target, [0, 1, 0])
   this.eye = new Float32Array(3)
   eye(this.view, this.eye)
   if (!self._materials) self.materials()
@@ -37,28 +37,11 @@ Scene.prototype.init = function () {
 Scene.prototype.defaults = function () {
   var self = this
 
-  _.forEach(self._shapes, function (shape) {
-    if (!shape.material) shape.material = 'basic'
-  })
-
   var material
   _.forEach(self._shapes, function (shape) {
     material = self._materials[shape.material]
     _.forEach(material.uniforms, function (prop, index) {
-      if (shape[prop]) shape._material[prop] = shape[prop]
-      if (!shape[prop]) shape._material[prop] = material.defaults[index]
-    })
-  })
-
-  _.forEach(self._lights, function (light) {
-    _.defaults(light, {
-      color: [1.0, 1.0, 1.0],
-      brightness: 1,
-      attenuation: 0.5,
-      ambient: 1,
-      cutoff: 180,
-      target: [0, 0, -1],
-      exponent: 0.0
+      if (!shape.uniforms[prop]) shape.uniforms[prop] = material.defaults[index]
     })
   })
 }
@@ -71,7 +54,10 @@ Scene.prototype.materials = function (materials) {
 			basic: {
 	  		shader: Shader(self.gl,
 			    glslify('./shaders/basic.vert'),
-			    glslify('./shaders/basic.frag').replace(/LIGHTTYPE/g, 'BasicLight').replace(/MATERIALTYPE/g, 'BasicMaterial')
+			    glslify('./shaders/basic.frag')
+            .replace(/LIGHTCOUNT/g, self._lights.length)
+            .replace(/LIGHTTYPE/g, 'BasicLight')
+            .replace(/MATERIALTYPE/g, 'BasicMaterial')
 			  ),
 			  uniforms: ['emissive', 'ambient', 'specular', 'diffuse', 'shininess', 'roughness'],
         defaults: [[0.0, 0.0, 0.0], [0.2, 0.2, 0.2], [0.0, 0.0, 0.0], [0.8, 0.8, 0.8], 20.0, 0.7]
@@ -85,51 +71,44 @@ Scene.prototype.materials = function (materials) {
 Scene.prototype.shapes = function (objects, styles) {
   var self = this
 
-  var attr
+  var shapes = []
   _.forEach(objects, function (object) {
-    attr = _.find(styles, ['tag', '#' + object.id])
-    if (attr) _.assign(object, attr)
-    attr = _.find(styles, ['tag', '.' + object.class])
-  	if (attr) _.assign(object, attr)
+    shapes.push(Shape({
+      gl: self.gl,
+      id: object.id,
+      class: object.class,
+      complex: object.complex,
+      model: object.model,
+      material: object.material,
+      styles: styles
+    }))
   })
 
-  var complex
-  _.forEach(objects, function (object) {
-    if (!object.complex) throw Error('No simplicial complex specified for shape ' + object.id)
-    if (!object.move) throw Error('No move matrix specified for shape ' + object.id)
-    complex = object.complex
-    complex = reindex(unindex(complex.positions, complex.cells))
-    object.geometry = Geometry(self.gl)
-    object.geometry.attr('position', complex.positions)
-    object.geometry.attr('normal', normals.vertexNormals(complex.cells, complex.positions))
-    object.geometry.faces(complex.cells)
-    object.animate = mat4.create()
-    object.moveT = mat3.create()
-    object.animateT = mat3.create()
-    object.render = true
-    object._material = {}
+  _.forEach(shapes, function (shape) {
+    shape.set()
   })
 
-  self._shapes = objects
+  self._shapes = shapes
 }
 
 Scene.prototype.lights = function (objects, styles) {
   var self = this
 
-  var attr
+  var lights = []
   _.forEach(objects, function (object) {
-    attr = _.find(styles, ['tag', '#' + object.id])
-    if (attr) _.assign(object, attr)
-    attr = _.find(styles, ['tag', '.' + object.class])
-    if (attr) _.assign(object, attr)
+    lights.push(Light({
+      id: object.id,
+      class: object.class,
+      position: object.position,
+      styles: styles
+    }))
   })
 
-  _.forEach(objects, function (object) {
-    if (!object.position) throw Error('No position vector specified for light ' + object.id)
-    object.enabled = true
+  _.forEach(lights, function (light) {
+    light.set()
   })
 
-  self._lights = objects
+  self._lights = lights
 }
 
 Scene.prototype.draw = function () {
@@ -145,8 +124,8 @@ Scene.prototype.draw = function () {
   self.gl.enable(self.gl.DEPTH_TEST)
 
   _.forEach(self._shapes, function (shape) {
-    if (shape.render) {
-      mat3.normalFromMat4(shape.moveT, shape.move)
+    if (shape.enabled) {
+      mat3.normalFromMat4(shape.modelT, shape.model)
       mat3.normalFromMat4(shape.animateT, shape.animate)
     	
       shape.shader = self._materials[shape.material]
@@ -154,14 +133,13 @@ Scene.prototype.draw = function () {
       shape.shader.shader.uniforms.proj = self.proj
       shape.shader.shader.uniforms.view = self.view
       shape.shader.shader.uniforms.eye = self.eye
-      shape.shader.shader.uniforms.background = self.background
       shape.shader.shader.uniforms.lights = self._lights
 
-      shape.shader.shader.uniforms.move = shape.move
-      shape.shader.shader.uniforms.moveT = shape.moveT
+      shape.shader.shader.uniforms.model = shape.model
+      shape.shader.shader.uniforms.modelT = shape.modelT
       shape.shader.shader.uniforms.animate = shape.animate
       shape.shader.shader.uniforms.animateT = shape.animateT
-      shape.shader.shader.uniforms.material = shape._material
+      shape.shader.shader.uniforms.material = shape.uniforms
       
       shape.geometry.draw(self.gl.TRIANGLES)
       shape.geometry.unbind()
@@ -170,31 +148,23 @@ Scene.prototype.draw = function () {
 }
 
 Scene.prototype.update = function (camera) {
-  var self = this
-  camera.view(self.view)
-  eye(self.view, self.eye)
+  camera.view(this.view)
+  eye(this.view, this.eye)
   this.frame += 1
 }
 
-Scene.prototype.hide = function (tag) {
+Scene.prototype.select = function (selector) {
   var self = this
-  _.forEach(self.find(tag), function (shape) {
-    shape.render = false
-  })
-}
-
-Scene.prototype.show = function (tag) {
-  var self = this
-  _.forEach(self.find(tag), function (shape) {
-    shape.render = true
-  })
-}
-
-Scene.prototype.find = function (tag) {
-  var self = this
-  if (!(tag.startsWith('#') || tag.startsWith('.'))) tag = '#' + tag
-  if (tag.startsWith('#')) return [_.find(self._shapes, ['id', tag.replace('#', '')])]
-  if (tag.startsWith('.')) return _.filter(self._shapes, ['class', tag.replace('.', '')])
+  if (selector.split(' ').length == 1) selector = 'shape ' + selector
+  var parts = selector.split(' ')
+  var type = parts[0]
+  var label = parts[1]
+  var targets
+  if (type === 'shape') targets = self._shapes
+  if (type === 'light') targets = self._lights
+  if (!(label.startsWith('#') || label.startsWith('.'))) label = '#' + label
+  if (label.startsWith('#')) return _.find(targets, ['id', label.replace('#', '')])
+  if (label.startsWith('.')) return _.find(targets, ['class', label.replace('.', '')])
 }
 
 module.exports = Scene
