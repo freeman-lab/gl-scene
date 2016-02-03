@@ -49,11 +49,14 @@ var opts = [
 scene.shapes(shapes, opts)
 
 var lights = [
+  {id: 'point', position: [0, 0, 5, 1]}, 
   {id: 'pear', position: [0, 8, 3, 1]},
   {id: 'apple', position: [8, 0, 1, 1]},
   {id: 'orange', position: [-5, -5, 2, 1]}
 ]
+
 var opts = [
+  {tag: '#point', color: [1, 1, 1], brightness: 0.0, ambient: 0.0, attenuation: 0.01},
   {tag: '#pear', color: [0.0, 0.9, 0.1], brightness: 8.0, ambient: 0.0, attenuation: 0.01},
   {tag: '#apple', color: [0.8, 0.1, 0.0], brightness: 8.0, ambient: 0.0, attenuation: 0.01},
   {tag: '#orange', color: [0.9, 0.6, 0.0], brightness: 8.0, ambient: 0.0, attenuation: 0.01}
