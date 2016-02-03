@@ -18,7 +18,7 @@ npm install gl-scene --save
 See a simple example by cloning this repo then calling
 
 ```javascript
-npm start
+npm run example
 ```
 
 And see a more complex example with
