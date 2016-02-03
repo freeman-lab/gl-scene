@@ -121,7 +121,7 @@ scene.lights(lights, styles)
 scene.init()
 ```
 
-Before redrawing, we're also going to update the shape properties, making the floor darker, and giving each sphere the same emissive color as the light, so they look like they're glowing. We can use `select` to update styles (and also do things like movement, see below).
+Before redrawing, we're also going to update the shape properties using `select`: we'll make the floor darker, and give each sphere an emissive color matching its light. 
 
 ```javascript
 scene.select('shape #floor').style({diffuse: [0.3, 0.3, 0.3]})
