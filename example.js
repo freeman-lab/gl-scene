@@ -10,41 +10,55 @@ var gl = context(canvas)
 fit(canvas)
 
 var scene = require('./index.js')(gl, {
-  viewer: [0, -5, 20], 
+  viewer: [0, -18, 8], 
   background: [0.02, 0.02, 0.02]
 })
 
 var shapes = [
   {
-    id: 'sun',
-    complex: icosphere(4),
-    model: [2, 0, 0, 0, 0, 2, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1]
+    id: 'floor',
+    complex: extrude([[-50, 50], [-50, -50], [50, -50], [50, 50]], {top: 0, bottom: -2}),
+    model: [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]
   },
   {
-    id: 'earth', class: 'planet',
+    id: 'apple', class: 'sphere',
     complex: icosphere(4),
-    model: [1.5, 0, 0, 0, 0, 1.5, 0, 0, 0, 0, 1.5, 0, 6, 0, 0, 1]
+    model: [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 8, 0, 1, 1]
   },
   {
-    id: 'mars', class: 'planet',
+    id: 'orange', class: 'sphere',
     complex: icosphere(4),
-    model: [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 6, 0, 1]
+    model: [2, 0, 0, 0, 0, 2, 0, 0, 0, 0, 2, 0, -5, -5, 2, 1]
   },
   {
-    id: 'neptune', class: 'planet',
+    id: 'pear', class: 'sphere',
     complex: icosphere(4),
-    model: [1.25, 0, 0, 0, 0, 1.25, 0, 0, 0, 0, 1.25, 0, -4.8, -4.8, 0, 1]
+    model: [3, 0, 0, 0, 0, 3, 0, 0, 0, 0, 3, 0, 0, 8, 3, 1]
   }
 ]
 
-var styles = [
-  {tag: '#sun', emissive: [0.9, 0.9, 0]},
-  {tag: '#earth', ambient: [0.0, 0.4, 0.2]},
-  {tag: '#mars', ambient: [0.6, 0.1, 0.1]},
-  {tag: '#neptune', ambient: [0.0, 0.2, 0.4]},
-  {tag: '.planet', diffuse: [0.9, 0.9, 0.9]}
+var shapeStyles = [
+  {tag: '#floor', diffuse: [0.3, 0.3, 0.3]},
+  {tag: '#apple', emissive: [0.8, 0.1, 0.0]},
+  {tag: '#pear', emissive: [0.0, 0.9, 0.1]},
+  {tag: '#orange', emissive: [0.9, 0.6, 0.0]},
+  {tag: '.sphere', diffuse: [0.1, 0.1, 0.1]}
 ]
 
-scene.shapes(shapes, styles)
+var lights = [
+  {id: 'pear', class: 'glow', position: [0, 8, 3, 1]},
+  {id: 'apple', class: 'glow', position: [8, 0, 1, 1]},
+  {id: 'orange', class: 'glow', position: [-5, -5, 2, 1]}
+]
+
+var lightStyles = [
+  {tag: '#pear', color: [0.0, 0.9, 0.1]},
+  {tag: '#apple', color: [0.8, 0.1, 0.0]},
+  {tag: '#orange', color: [0.9, 0.6, 0.0]},
+  {tag: '.glow', brightness: 8.0, ambient: 0.0, attenuation: 0.01}
+]
+
+scene.shapes(shapes, shapeStyles)
+scene.lights(lights, lightStyles)
 scene.init()
 scene.draw()

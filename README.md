@@ -38,53 +38,51 @@ Now create the scene, passing options for background color and viewer position
 
 ```javascript
 var scene = require('gl-scene')(gl, {
-  viewer: [0, -5, 20], 
+  viewer: [0, -18, 8], 
   background: [0.02, 0.02, 0.02]
 })
 ```
 
-A scene requires a list of shapes. It can additionally include lights and custom materials. We'll make a simple scene consisting of four spheres, representing three planets and a sun. We can set an `id` and `class` for styling later, and we specify a 4x4 `model` matrix, which controls rotation, translation, and scale.
+A scene requires a list of shapes. It can additionally include lights and custom materials. We'll make a simple scene consisting of three spheres on a flat surface. We can set an `id` and `class` for styling later, and we specify a 4x4 `model` matrix, which controls rotation, translation, and scale.
 
 ```javascript
 var icosphere = require('icosphere')
+var extrude = require('extrude')
 
 var shapes = [
   {
-    id: 'sun', class: 'star'
-    complex: icosphere(4),
-    model: [2, 0, 0, 0, 0, 2, 0, 0, 0, 0, 2, 0, 0, 0, 0, 1]
+    id: 'floor',
+    complex: extrude([[-50, 50], [-50, -50], [50, -50], [50, 50]], {top: 0, bottom: -2}),
+    model: [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]
   },
   {
-    id: 'earth', class: 'planet',
+    id: 'apple', class: 'sphere',
     complex: icosphere(4),
-    model: [1.5, 0, 0, 0, 0, 1.5, 0, 0, 0, 0, 1.5, 0, 6, 0, 0, 1]
+    model: [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 8, 0, 1, 1]
   },
   {
-    id: 'mars', class: 'planet',
+    id: 'orange', class: 'sphere',
     complex: icosphere(4),
-    model: [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 6, 0, 1]
+    model: [2, 0, 0, 0, 0, 2, 0, 0, 0, 0, 2, 0, -5, -5, 2, 1]
   },
   {
-    id: 'neptune', class: 'planet',
+    id: 'pear', class: 'sphere',
     complex: icosphere(4),
-    model: [1.25, 0, 0, 0, 0, 1.25, 0, 0, 0, 0, 1.25, 0, -4.8, -4.8, 0, 1]
+    model: [3, 0, 0, 0, 0, 3, 0, 0, 0, 0, 3, 0, 0, 8, 3, 1]
   }
 ]
 ```
 
-We can set styles by mapping `id` or `class` to material properties. We'll add a diffuse component to all planets, a different ambient color to each one, and an emissive color on the sun.
+We can set styles by mapping `id` or `class` to material properties. For now we'll just give all shapes a moderate ambient intensity.
 
 ```javascript
 var styles = [
-  {tag: '#sun', emissive: [0.9, 0.9, 0]},
-  {tag: '#earth', ambient: [0.0, 0.4, 0.2]},
-  {tag: '#mars', ambient: [0.6, 0.1, 0.1]},
-  {tag: '#neptune', ambient: [0.0, 0.2, 0.4]},
-  {tag: '.planet', diffuse: [0.9, 0.9, 0.9]}
+  {tag: '#floor', ambient: [0.2, 0.2, 0.2]},
+  {tag: '.sphere', ambient: [0.2, 0.2, 0.2]}
 ]
 ```
 
-We can add these shapes, with styles, to our scene, initialize, and draw!
+We can add these shapes and their styles to our scene, initialize, and draw!
 
 ```javascript
 scene.shapes(shapes, styles)
@@ -96,47 +94,50 @@ It should look like:
 
 ![example-0](pngs/example-stage-0.png)
 
-We didn't specify any lights, so we got a default white light above the origin. Let's make our own: a bright yellow light at the origin to represent the sun! Specify an `id` and 4x1 `position`.
+We didn't specify any lights, so we got the default: a white light above the origin. Let's add a bright colored light centered on each sphere. We define a list of lights and styles, just as we did with shapes.
 
 ```javascript
 var lights = [
-  {id: 'sun', position: [0, 0, 2, 1]}
+  {id: 'pear', class: 'glow', position: [0, 8, 3, 1]},
+  {id: 'apple', class: 'glow', position: [8, 0, 1, 1]},
+  {id: 'orange', class: 'glow', position: [-5, -5, 2, 1]}
 ]
-```
 
-Set styles by making it bright yellow and moderately ambient.
-
-```javascript
 var styles = [
-  {tag: '#sun', color: [0.9, 0.9, 0.0], brightness: 2.5, ambient: 0.5, attenuation: 0.01}
+  {tag: '.glow', brightness: 8.0, ambient: 0.0, attenuation: 0.01},
+  {tag: '#pear', color: [0.0, 0.9, 0.1]},
+  {tag: '#apple', color: [0.8, 0.1, 0.0]},
+  {tag: '#orange', color: [0.9, 0.6, 0.0]}
 ]
 ```
 
-Add it to the scene, reinitialize, and draw.
+Add the lights to the scene and reinitialize.
 
 ```javascript
 scene.lights(lights, styles)
 scene.init()
+```
+
+Before redrawing, we're going to update the shape properties, making the floor darker, and giving each sphere the same emissive color as the light, so they look like they're glowing. We can use `select` to update styles (and also do things like movement, see below).
+
+```javascript
+scene.select('shape #floor').style({diffuse: [0.3, 0.3, 0.3]})
+scene.select('shape #apple').style({emissive: [0.8, 0.1, 0.0], diffuse: [0.1, 0.1, 0.1]})
+scene.select('shape #orange').style({emissive: [0.9, 0.6, 0.0], diffuse: [0.1, 0.1, 0.1]})
+scene.select('shape #pear').style({emissive: [0.0, 0.9, 0.1], diffuse: [0.1, 0.1, 0.1]})
+```
+
+Finally redraw the scene
+
+```javascript
 scene.draw()
 ```
 
-And you'll see:
+Glowing fruit!
 
 ![example-1](pngs/example-stage-1.png)
 
-Finally, let's add a simple animation, where the sun grows and shrinks, and the light gets brighter and dimmer. You can `select` both shapes and lights and then use functions like `move` and `style` to dynamically change their properties.
-
-```javascript
-setInterval(function () {
-  var d = Math.sin(scene.frame / 30)
-  scene.select('#sun').move(function (m) {mat4.scale(m, mat4.create(), [2 + d, 2 + d, 2 + d])})
-  scene.select('light #sun').style({brightness: 2.5 + d * 1.5})
-  scene.draw()
-}, 10)
-```
-Fun!
-
-![example-2](gifs/example-stage-2.gif)
+See [example](example.js) for a script that generates this image, and see [demo] for a slightly more complex animal that adds a camera and uses `select` to dynamically modify properties that turn the glowing on and off.
 
 ## methods
 
