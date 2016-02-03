@@ -9,7 +9,7 @@ var canvas = document.body.appendChild(document.createElement('canvas'))
 window.addEventListener('resize', fit(canvas), false)
 var gl = context(canvas, tick)
 
-var scene = require('./index.js')(gl)
+var scene = require('./index.js')(gl, {viewer: [0, -20, 10]})
 
 var shapes = [
   {
@@ -79,7 +79,7 @@ function tick () {
     scene.select('light #orange').toggle()
   }
  
-  camera.tick()
-  scene.update(camera)
+  //camera.tick()
+  //scene.update(camera)
   scene.draw()
 }

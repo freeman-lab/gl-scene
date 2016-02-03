@@ -73,7 +73,7 @@ var shapes = [
 ]
 ```
 
-We can set styles by mapping `id` or `class` to material properties. For now we'll just give all shapes a moderate ambient intensity.
+We set styles by mapping `id` or `class` to properties. For now we'll give all shapes a moderate ambient intensity.
 
 ```javascript
 var styles = [
@@ -82,7 +82,7 @@ var styles = [
 ]
 ```
 
-We can add these shapes and their styles to our scene, initialize, and draw!
+Then add these shapes and their styles to our scene, initialize, and draw!
 
 ```javascript
 scene.shapes(shapes, styles)
@@ -111,14 +111,14 @@ var styles = [
 ]
 ```
 
-Add the lights to the scene and reinitialize.
+Add the lights to the scene and reinitialize (you always need to initialize after specifiying shapes or lights, but styles and other properties can be dynamically updated).
 
 ```javascript
 scene.lights(lights, styles)
 scene.init()
 ```
 
-Before redrawing, we're going to update the shape properties, making the floor darker, and giving each sphere the same emissive color as the light, so they look like they're glowing. We can use `select` to update styles (and also do things like movement, see below).
+Before redrawing, we're also going to update the shape properties, making the floor darker, and giving each sphere the same emissive color as the light, so they look like they're glowing. We can use `select` to update styles (and also do things like movement, see below).
 
 ```javascript
 scene.select('shape #floor').style({diffuse: [0.3, 0.3, 0.3]})
@@ -137,7 +137,7 @@ Glowing fruit!
 
 ![example-1](pngs/example-stage-1.png)
 
-See [example](example.js) for a script that generates this image, and see [demo] for a slightly more complex animal that adds a camera and uses `select` to dynamically modify properties that turn the glowing on and off.
+See [example](example.js) for a script that generates this image, and see [demo](demo.js) for an example that adds a dynamic `camera` and uses `select` to dynamically turn the glowing on and off.
 
 ## methods
 
