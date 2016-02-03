@@ -137,7 +137,7 @@ Glowing fruit!
 
 ![example-1](pngs/example-stage-1.png)
 
-See [example](example.js) for a script that generates this image, and see [demo](demo.js) for an example that adds a dynamic `camera` and uses `select` to dynamically turn the glowing on and off.
+See the [example](example.js) for a script that generates this image, and see the [demo](demo.js) for an example that adds a dynamic `camera` and uses `select` to dynamically turn the glowing on and off.
 
 ## methods
 
