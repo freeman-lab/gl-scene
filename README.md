@@ -121,7 +121,7 @@ scene.lights(lights, styles)
 scene.init()
 ```
 
-Before redrawing, we're also going to update the shape properties using `select`. We'll make the floor darker, and give each sphere an emissive color matching its light. 
+Before redrawing, we're also going to update the shape styles using `select` and `style`. We'll make the floor darker, and give each sphere an emissive color matching its light. 
 
 ```javascript
 scene.select('shape #floor').style({diffuse: [0.3, 0.3, 0.3]})
