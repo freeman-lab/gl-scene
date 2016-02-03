@@ -111,7 +111,7 @@ var styles = [
 ]
 ```
 
-Add the lights to the scene and reinitialize (you always need to initialize after specifiying shapes or lights, but styles and other properties can be dynamically updated).
+Add the lights to the scene and reinitialize (you always need to initialize after specifiying shapes or lights, but styles and other properties can be dynamically updated afterward).
 
 ```javascript
 scene.lights(lights, styles)
