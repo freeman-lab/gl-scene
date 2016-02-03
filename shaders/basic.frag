@@ -5,9 +5,11 @@ varying vec3 vnormal;
 uniform vec3 eye;
 
 #pragma glslify: BasicLighting = require('glsl-basic-lighting')
+#pragma glslify: BasicLight = require('glsl-basic-light')
+#pragma glslify: BasicMaterial = require('glsl-basic-material')
 
-uniform LIGHTTYPE lights[LIGHTCOUNT];
-uniform MATERIALTYPE material;
+uniform BasicLight lights[LIGHTCOUNT];
+uniform BasicMaterial material;
 
 void main() {
   vec3 viewpoint = eye - vposition;

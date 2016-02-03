@@ -70,10 +70,7 @@ Scene.prototype.materials = function (materials) {
 			basic: {
 	  		shader: Shader(self.gl,
 			    glslify('./shaders/basic.vert'),
-			    glslify('./shaders/basic.frag')
-            .replace(/LIGHTCOUNT/g, self._lights.length)
-            .replace(/LIGHTTYPE/g, 'BasicLight')
-            .replace(/MATERIALTYPE/g, 'BasicMaterial')
+			    glslify('./shaders/basic.frag').replace(/LIGHTCOUNT/g, self._lights.length)
 			  ),
         defaults: {
           emissive: [0.0, 0.0, 0.0], 
