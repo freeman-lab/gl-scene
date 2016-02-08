@@ -21,17 +21,17 @@ var shapes = [
     model: [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]
   },
   {
-    id: 'apple', class: 'sphere',
+    id: 'apple', className: 'sphere',
     complex: icosphere(4),
     model: [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 8, 0, 1, 1]
   },
   {
-    id: 'orange', class: 'sphere',
+    id: 'orange', className: 'sphere',
     complex: icosphere(4),
     model: [2, 0, 0, 0, 0, 2, 0, 0, 0, 0, 2, 0, -5, -5, 2, 1]
   },
   {
-    id: 'pear', class: 'sphere',
+    id: 'pear', className: 'sphere',
     complex: icosphere(4),
     model: [3, 0, 0, 0, 0, 3, 0, 0, 0, 0, 3, 0, 0, 8, 3, 1]
   }
@@ -46,9 +46,9 @@ var shapeStyles = [
 ]
 
 var lights = [
-  {id: 'pear', class: 'glow', position: [0, 8, 3, 1]},
-  {id: 'apple', class: 'glow', position: [8, 0, 1, 1]},
-  {id: 'orange', class: 'glow', position: [-5, -5, 2, 1]}
+  {id: 'pear', className: 'glow', position: [0, 8, 3, 1]},
+  {id: 'apple', className: 'glow', position: [8, 0, 1, 1]},
+  {id: 'orange', className: 'glow', position: [-5, -5, 2, 1]}
 ]
 
 var lightStyles = [
