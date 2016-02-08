@@ -1,13 +1,14 @@
 var Shader = require('gl-shader')
-var Geometry = require('gl-geometry')
 var Shape = require('./components/shape.js')
 var Light = require('./components/light.js')
+var elements = require('./components/elements.js')
 var mat4 = require('gl-mat4')
 var mat3 = require('gl-mat3')
 var eye = require('eye-vector')
 var normals = require('normals')
 var glslify = require('glslify')
 var distance = require('euclidean-distance')
+var inherits = require('inherits')
 var _ = require('lodash')
 
 function Scene (gl, opts) {
@@ -40,12 +41,12 @@ Scene.prototype.init = function () {
 Scene.prototype._setDefaults = function () {
   var self = this
 
-  _.forEach(self._shapes, function (shape) {
-    shape.setDefaults(self._materials[shape.material].defaults)
+  self._shapes.each(function (d) {
+    _.defaults(d.style, self._materials[d.attributes.material].defaults)
   })
 
-  _.forEach(self._lights, function (light) {
-    light.setDefaults({
+  self._lights.each(function (d) {
+    _.defaults(d.style, {
       color: [1.0, 1.0, 1.0],
       attenuation: 0.05,
       brightness: 3.0,
@@ -99,16 +100,15 @@ Scene.prototype.shapes = function (objects, styles) {
     shapes.push(Shape({
       gl: self.gl,
       id: object.id,
-      class: object.class,
+      className: object.className,
       complex: object.complex,
       model: object.model,
       material: object.material
     }))
   })
 
-  _.forEach(shapes, function (shape) {
-    shape.setStyles()
-  })
+  shapes = elements(shapes)
+  shapes.each(function (d) {d.update()})
 
   self._shapes = shapes
 }
@@ -118,26 +118,25 @@ Scene.prototype.lights = function (objects, styles) {
   styles = styles || {}
   self._reset()
 
-  Light.prototype.styles = styles
-
   if (!objects) {
     objects = [
       {id: 'center', position: [0, 0, 5, 1]}
     ]
   }
 
+  Light.prototype.styles = styles
+
   var lights = []
   _.forEach(objects, function (object) {
     lights.push(Light({
       id: object.id,
-      class: object.class,
+      className: object.className,
       position: object.position
     }))
   })
 
-  _.forEach(lights, function (light) {
-    light.setStyles()
-  })
+  lights = elements(lights)
+  lights.each(function (d) {d.update()})
 
   self._lights = lights
 }
@@ -155,7 +154,7 @@ Scene.prototype.draw = function () {
   self.gl.clearColor(self.background[0], self.background[1], self.background[2], 1)
   self.gl.clear(self.gl.COLOR_BUFFER_BIT | self.gl.DEPTH_BUFFER_BIT)
   
-  self.lighting = _.map(self._lights, 'uniforms')
+  self.lighting = _.map(self._lights, 'style')
   _.merge(self.lighting, _.map(self._lights, 'attributes'))
 
   _.forEach(self._shapes, function (shape) {
@@ -163,7 +162,7 @@ Scene.prototype.draw = function () {
       mat3.normalFromMat4(shape.attributes.model_ti, shape.attributes.model)
       mat3.normalFromMat4(shape.attributes.animate_ti, shape.attributes.animate)
     	
-      shape.shader = self._materials[shape.material]
+      shape.shader = self._materials[shape.attributes.material]
       shape.attributes.geometry.bind(shape.shader.shader)
       shape.shader.shader.uniforms.proj = self.proj
       shape.shader.shader.uniforms.view = self.view
@@ -174,8 +173,8 @@ Scene.prototype.draw = function () {
       shape.shader.shader.uniforms.model_ti = shape.attributes.model_ti
       shape.shader.shader.uniforms.animate = shape.attributes.animate
       shape.shader.shader.uniforms.animate_ti = shape.attributes.animate_ti
-      shape.shader.shader.uniforms.material = shape.uniforms
-      
+      shape.shader.shader.uniforms.material = shape.style
+
       shape.attributes.geometry.draw(self.gl.TRIANGLES)
       shape.attributes.geometry.unbind()
     }
@@ -189,18 +188,29 @@ Scene.prototype.update = function (camera) {
   eye(this.view, this.eye)
 }
 
-Scene.prototype.select = function (selector) {
-  var self = this
-  if (selector.split(' ').length == 1) selector = 'shape ' + selector
+Scene.prototype._selector = function (selector) {
+  var type
   var parts = selector.split(' ')
-  var type = parts[0]
-  var label = parts[1]
-  var targets
-  if (type === 'shape') targets = self._shapes
-  if (type === 'light') targets = self._lights
-  if (!(label.startsWith('#') || label.startsWith('.'))) label = '#' + label
-  if (label.startsWith('#')) return _.find(targets, ['id', label.replace('#', '')])
-  if (label.startsWith('.')) return _.find(targets, ['class', label.replace('.', '')])
+  if (parts.length < 2) {
+    type = 'shape'
+    selector = parts[0]
+  } else {
+    type = parts[0]
+    selector = parts.slice(1, parts.length).join(' ')
+  }
+  return {type: type, selector: selector}
+}
+
+Scene.prototype.selectAll = function (selector) {
+  var parsed = this._selector(selector)
+  if (parsed.type === 'shape') return this._shapes.selectAll(parsed.selector)
+  if (parsed.type === 'light') return this._shapes.selectAll(parsed.selector)
+}
+
+Scene.prototype.select = function (selector) {
+  var parsed = this._selector(selector)
+  if (parsed.type === 'shape') return this._shapes.select(parsed.selector)
+  if (parsed.type === 'light') return this._lights.select(parsed.selector)
 }
 
 module.exports = Scene

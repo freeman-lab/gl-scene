@@ -1,8 +1,6 @@
-var inherits = require('inherits')
-var Element = require('./element.js')
+var _ = require('lodash')
 
 module.exports = Light
-inherits(Light, Element)
 
 function Light (opts) {
   if (!(this instanceof Light)) return new Light(opts)
@@ -11,15 +9,17 @@ function Light (opts) {
   if (!opts.id) throw Error ("Must provide an id")
   var self = this
   self.id = opts.id
-  self.class = opts.class || ''
+  self.className = opts.className || ''
+  self.style = {}
   self.attributes = {
     position: opts.position,
     enabled: true
   }
-  self.uniforms = {}
-}
 
-Light.prototype.move = function (op) {
-  var self = this
-  op(self.attributes.position)
+  self.update = function () {
+    style = _.find(self.styles, ['tag', '#' + self.id])
+    if (style) _.assign(self.style, _.omit(style, 'tag'))
+    style = _.find(self.styles, ['tag', '.' + self.className])
+    if (style) _.assign(self.style, _.omit(style, 'tag'))
+  }
 }

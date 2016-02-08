@@ -4,6 +4,7 @@ var orbit = require('canvas-orbit-camera')
 var mat4 = require('gl-mat4')
 var icosphere = require('icosphere')
 var extrude = require('extrude')
+var fps = require('fps')
 
 var canvas = document.body.appendChild(document.createElement('canvas'))
 window.addEventListener('resize', fit(canvas), false)
@@ -67,7 +68,13 @@ scene.init()
 
 var camera = orbit(canvas)
 
+var timer = fps({every: 60})
+timer.on('data', function(framerate) {
+  console.log(framerate)
+})
+
 function tick () { 
+  timer.tick()
 
   if ((scene.frame + 5) % 30 == 0) {
     scene.select('#pear').toggleClass('dark')
