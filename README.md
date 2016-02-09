@@ -180,26 +180,26 @@ Draw the scene to the `webgl` context.
 
 All manipulation works by first selecting an element -- a shape or a light -- and then changing its properties.
 
-#### `scene.select(selector)`
+#### `selection = scene.select(selector)`
 
-Returns the first `element` that matches the given tag. Selector should be of the form: `#id`, `.class`, `shape #id`, `shape .class`, `light #id`, or `light .class`. If `shape` or `light` is unspecified, will first look for a matching shape, and then a matching light.
+Returns the first scene component that matches the given tag. Selector should be of the form: `#id`, `.class`, `shape #id`, `shape .class`, `light #id`, or `light .class`. If `shape` or `light` is unspecified, will first look for a matching shape, and then a matching light.
 
 
-#### `element.hide()`
+#### `selection.hide()`
 
 Hide the given element. For a shape, will remove it from the scene. For a light, will remove its effect on the scene.
 
-#### `element.show()`
+#### `selection.show()`
 
 Show the given element. For a shape, will add it back to the scene. For a light, will include its effect on the scene.
 
-#### `element.toggle()`
+#### `selection.toggle()`
 
 Show or hide the given element depending on its current state.
 
-#### `element.move(func)`
+#### `selection.move(func)`
 
-Move an element by providing a function `func` that should take as input a `model` matrix (for shapes) or a `position` vector (for lights), and modify it in place.
+Move an selection by providing a function `func` that should take as input a `model` matrix (for shapes) or a `position` vector (for lights), and modify it in place.
 
 ```javascript
 scene.find('shape #earth').move(function (model) {mat4.translate(model, model, [0, 5, 0])})
@@ -208,9 +208,9 @@ scene.find('shape #earth').move(function (model) {mat4.translate(model, model, [
 scene.find('light #sun').move(function (position) {position[1] += 5})
 ```
 
-#### `element.style({name: value})`
+#### `selection.style({name: value})`
 
-Set one or more style properties on the element.
+Set one or more style properties on the selection.
 
 ```javascript
 scene.find('shape #earth').style({emissive: [0.6, 0.2, 0.1]})
@@ -219,17 +219,17 @@ scene.find('shape #earth').style({emissive: [0.6, 0.2, 0.1]})
 scene.find('light #sun').style({color: [0.5, 0.5, 0.5]})
 ```
 
-#### `element.classed(name, value)`
+#### `selection.classed(name, value)`
 
-Set class `name` on the element to `value`, which should be truthy.
+Set class `name` on the selection to `value`, which should be truthy.
 
 ```javascript
 scene.find('shape #earth').classed('planet', false)
 ```
 
-#### `element.toggleClass(name)`
+#### `selection.toggleClass(name)`
 
-Add or remove class `name` on the given element depending on its current state.
+Add or remove class `name` on the selection depending on its current state.
 
 ```javascript
 scene.find('shape #earth').toggleClass('planet')
