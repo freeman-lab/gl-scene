@@ -135,7 +135,7 @@ scene.stylesheet(stylesheet)
 
 #### selections
 
-You can select shapes and lights by their `id` or `class` and change their properties, with methods inspired by `d3`. For example, this would raise the shape with id `orange` and increase the brightness of all lights with class `glow`:
+You can select shapes and lights by their `id` or `class` and change their properties, with methods inspired by `d3`. For example, this would move the shape with id `orange` and increase the brightness of all lights with class `glow`:
 
 ```javascript
 scene.select('#orange').position([-5, -5, 8])
