@@ -1,7 +1,6 @@
-var Shader = require('gl-shader')
-var Shape = require('./components/shape.js')
-var Light = require('./components/light.js')
-var elements = require('./components/elements.js')
+var Material = require('gl-scene-material')
+var Shape = require('./lib/shape.js')
+var Light = require('./lib/light.js')
 var mat4 = require('gl-mat4')
 var mat3 = require('gl-mat3')
 var eye = require('eye-vector')
@@ -9,7 +8,10 @@ var normals = require('normals')
 var glslify = require('glslify')
 var distance = require('euclidean-distance')
 var inherits = require('inherits')
+var selectify = require('selectify')
 var _ = require('lodash')
+
+module.exports = Scene
 
 function Scene (gl, opts) {
   if (!(this instanceof Scene)) return new Scene(gl, opts)
@@ -27,7 +29,7 @@ Scene.prototype.init = function () {
   var self = this
   if (!self._shapes) throw Error('Cannot initialize without shapes')
   this.frame = 0
-  this.proj = mat4.create()
+  this.projection = mat4.create()
   this.view = mat4.lookAt(mat4.create(), self.viewer, self.target, [0, 1, 0])
   this.eye = new Float32Array(3)
   eye(this.view, this.eye)
@@ -35,6 +37,10 @@ Scene.prototype.init = function () {
   if (!self._lights) self.lights()
   if (!self._materials) self.materials()
   self._setDefaults()
+  Shape.prototype.styles = self._styles
+  Light.prototype.styles = self._styles
+  if (self._shapes) self._shapes.each(function (d) {d.update()})
+  if (self._lights) self._lights.each(function (d) {d.update()})
   this.ready = true
 }
 
@@ -49,7 +55,7 @@ Scene.prototype._setDefaults = function () {
     _.defaults(d.style, {
       color: [1.0, 1.0, 1.0],
       attenuation: 0.05,
-      brightness: 3.0,
+      intensity: 3.0,
       ambient: 1.0,
       cutoff: 180,
       target: [0, 0, -1],
@@ -63,54 +69,43 @@ Scene.prototype._reset = function () {
   delete this._materials
 }
 
-Scene.prototype.materials = function (materials) {
+Scene.prototype.styles = function (styles) {
+  var self = this
+  self._styles = _.extend(self._styles || {}, styles || {})
+}
+
+Scene.prototype.materials = function (objects) {
   var self = this
 
-	if (!materials) {
-		materials = {
-			basic: {
-	  		shader: Shader(self.gl,
-			    glslify('./shaders/basic.vert'),
-			    glslify('./shaders/basic.frag').replace(/LIGHTCOUNT/g, self._lights.length)
-			  ),
-        defaults: {
-          emissive: [0.0, 0.0, 0.0], 
-          ambient: [0.2, 0.2, 0.2], 
-          specular: [0.0, 0.0, 0.0], 
-          diffuse: [0.8, 0.8, 0.8], 
-          shininess: 20.0,
-          roughness: 0.7
-        }
-		  }
+	if (!objects) {
+		objects = {
+			lambert: require('gl-scene-lambert-material'),
+      normal: require('gl-scene-normal-material')
 		}
 	} 
+
+  var materials = {}
+  _.forEach(objects, function (object, key) {
+    materials[key] = Material(self.gl, object, {LIGHTCOUNT: self._lights.length})
+  })
 
 	self._materials = materials
 }
 
-Scene.prototype.shapes = function (objects, styles) {
+Scene.prototype.shapes = function (objects) {
   var self = this
-  styles = styles || {}
   self._reset()
 
-  Shape.prototype.styles = styles
-
+  var styles = {}
   var shapes = []
-  _.forEach(objects, function (object) {
-    shapes.push(Shape({
-      gl: self.gl,
-      id: object.id,
-      className: object.className,
-      complex: object.complex,
-      model: object.model,
-      material: object.material
-    }))
+  _.forEach(objects, function (object, id) {
+    if (!object.id) object.id = 'shape-' + id
+    shapes.push(Shape(self.gl, object))
+    if (object.styles) styles['#' + object.id] = object.styles
   })
 
-  shapes = elements(shapes)
-  shapes.each(function (d) {d.update()})
-
-  self._shapes = shapes
+  self.styles(styles)
+  self._shapes = elements(shapes)
 }
 
 Scene.prototype.lights = function (objects, styles) {
@@ -124,31 +119,31 @@ Scene.prototype.lights = function (objects, styles) {
     ]
   }
 
-  Light.prototype.styles = styles
-
+  var styles = {}
   var lights = []
-  _.forEach(objects, function (object) {
-    lights.push(Light({
-      id: object.id,
-      className: object.className,
-      position: object.position
-    }))
+  _.forEach(objects, function (object, id) {
+    if (!object.id) object.id = 'light-' + id
+    lights.push(Light(object))
+    if (object.styles) styles['#' + object.id] = object.styles
   })
 
-  lights = elements(lights)
-  lights.each(function (d) {d.update()})
-
-  self._lights = lights
+  self.styles(styles)
+  self._lights = elements(lights)
 }
 
-Scene.prototype.draw = function () {
+Scene.prototype.draw = function (camera) {
   var self = this
   if (!self.ready) throw Error('Scene must be initialized before drawing!')
+
+  if (camera) {
+    camera.view(self.view)
+    eye(self.view, self.eye)
+  }
 
   self.width = self.gl.drawingBufferWidth
   self.height = self.gl.drawingBufferHeight
   self.gl.viewport(0, 0, self.width, self.height)
-  mat4.perspective(self.proj, self.fov, self.width / self.height, self.near, self.far)
+  mat4.perspective(self.projection, self.fov, self.width / self.height, self.near, self.far)
 
   self.gl.enable(self.gl.DEPTH_TEST)
   self.gl.clearColor(self.background[0], self.background[1], self.background[2], 1)
@@ -158,23 +153,20 @@ Scene.prototype.draw = function () {
   _.merge(self.lighting, _.map(self._lights, 'attributes'))
 
   _.forEach(self._shapes, function (shape) {
-    if (shape.attributes.enabled) {
-      mat3.normalFromMat4(shape.attributes.model_ti, shape.attributes.model)
-      mat3.normalFromMat4(shape.attributes.animate_ti, shape.attributes.animate)
-    	
+    if (shape.attributes.visible) {
+      mat3.normalFromMat4(shape.attributes.modelNormal, shape.attributes.model)
+
       shape.shader = self._materials[shape.attributes.material]
       shape.attributes.geometry.bind(shape.shader.shader)
-      shape.shader.shader.uniforms.proj = self.proj
+      shape.shader.shader.uniforms.projection = self.projection
       shape.shader.shader.uniforms.view = self.view
       shape.shader.shader.uniforms.eye = self.eye
-      shape.shader.shader.uniforms.lights = self.lighting
+      shape.shader.shader.uniforms.lighting = self.lighting
 
       shape.shader.shader.uniforms.model = shape.attributes.model
-      shape.shader.shader.uniforms.model_ti = shape.attributes.model_ti
-      shape.shader.shader.uniforms.animate = shape.attributes.animate
-      shape.shader.shader.uniforms.animate_ti = shape.attributes.animate_ti
-      shape.shader.shader.uniforms.material = shape.style
-
+      shape.shader.shader.uniforms.modelNormal = shape.attributes.modelNormal
+      shape.shader.shader.uniforms.style = shape.style
+      
       shape.attributes.geometry.draw(self.gl.TRIANGLES)
       shape.attributes.geometry.unbind()
     }
@@ -183,34 +175,62 @@ Scene.prototype.draw = function () {
   this.frame += 1
 }
 
-Scene.prototype.update = function (camera) {
-  camera.view(this.view)
-  eye(this.view, this.eye)
-}
-
-Scene.prototype._selector = function (selector) {
-  var type
-  var parts = selector.split(' ')
-  if (parts.length < 2) {
-    type = 'shape'
-    selector = parts[0]
-  } else {
-    type = parts[0]
-    selector = parts.slice(1, parts.length).join(' ')
-  }
-  return {type: type, selector: selector}
-}
-
 Scene.prototype.selectAll = function (selector) {
-  var parsed = this._selector(selector)
-  if (parsed.type === 'shape') return this._shapes.selectAll(parsed.selector)
-  if (parsed.type === 'light') return this._shapes.selectAll(parsed.selector)
+  var selection = this._shapes.selectAll(selector)
+  if (!selection) selection = this._lights.selectAll(selector)
+  if (!selection) throw Error('No matching items for: ' + selector)
+  return selection
 }
 
 Scene.prototype.select = function (selector) {
-  var parsed = this._selector(selector)
-  if (parsed.type === 'shape') return this._shapes.select(parsed.selector)
-  if (parsed.type === 'light') return this._lights.select(parsed.selector)
+  var selection = this._shapes.select(selector)
+  if (!selection) selection = this._lights.select(selector)
+  if (!selection) throw Error('No matching items for: ' + selector)
+  return selection
 }
 
-module.exports = Scene
+inherits(elements, selectify)
+
+function elements (items) {
+  if (!(this instanceof elements)) return new elements(items)
+  elements.super_.call(this, items)
+}
+
+_.assign(elements.prototype, {
+  show: function () {
+    return this.each(function (d) {
+      d.attributes.visible = true
+    })
+  },
+
+  hide: function () {
+    return this.each(function (d) {
+      d.attributes.visible = false
+    })
+  },
+
+  toggle: function () {
+    return this.each(function (d) {
+      d.attributes.visible ? d.attributes.visible = false : d.attributes.visible = true
+    })
+  },
+
+  position: function (value) {
+    return this.each(function (d) {
+      d.position(value)
+    })
+  },
+
+  scale: function (value) {
+    return this.each(function (d) {
+      d.scale(value)
+    })
+  },
+
+  rotation: function (value, axis) {
+    return this.each(function (d) {
+      d.rotation(value, axis)
+    })
+  }
+})
+
