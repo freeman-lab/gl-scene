@@ -176,6 +176,7 @@ Scene.prototype.draw = function (camera) {
 }
 
 Scene.prototype.selectAll = function (selector) {
+  if (!this._shapes) throw Error('No shapes to select')
   var selection = this._shapes.selectAll(selector)
   if (!selection) selection = this._lights.selectAll(selector)
   if (!selection) throw Error('No matching items for: ' + selector)
@@ -183,6 +184,7 @@ Scene.prototype.selectAll = function (selector) {
 }
 
 Scene.prototype.select = function (selector) {
+  if (!this._shapes) throw Error('No shapes to select')
   var selection = this._shapes.select(selector)
   if (!selection) selection = this._lights.select(selector)
   if (!selection) throw Error('No matching items for: ' + selector)
