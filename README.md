@@ -46,7 +46,7 @@ var scene = require('gl-scene')(gl, {
 })
 ```
 
-A scene requires a list of shapes. It can additionally include lights and custom materials. We'll make a simple scene consisting of three spheres on a flat surface. We can set an `id` and `class` for styling later, and we specify a `position` and `scale`, which gets turned into a `4x4` model matrix.
+A scene requires a list of shapes. It can additionally include lights and custom materials. We'll make a simple scene consisting of three spheres on a flat surface. We can set an `id` for selecting later, and we specify a `position` and `scale`, which gets turned into a `4x4` model matrix.
 
 ```javascript
 var icosphere = require('icosphere')
