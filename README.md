@@ -93,13 +93,13 @@ We didn't specify any lights, so we got the default: a white light above the ori
 ```javascript
 var lights = [
   {
-    position: [0, 8, 3, 1], 
+    position: [0, 8, 3], 
     styles: {color: [0.0, 0.9, 0.1], brightness: 8.0, ambient: 0.0, attenuation: 0.01}},
   {
-    position: [8, 0, 1, 1], 
+    position: [8, 0, 1], 
     styles: {color: [0.8, 0.1, 0.0], brightness: 8.0, ambient: 0.0, attenuation: 0.01}},
   {
-    position: [-5, -5, 2, 1], 
+    position: [-5, -5, 2], 
     styles: {color: [0.9, 0.6, 0.0], brightness: 8.0, ambient: 0.0, attenuation: 0.01}}
 ]
 ```
@@ -135,10 +135,11 @@ scene.stylesheet(stylesheet)
 
 #### selections
 
-You can select shapes and lights by `id` or `class` and change their properties with methods inspired by `d3`. For example, this would raise all `glow` lights and increase their brightness:
+You can select shapes and lights by their `id` or `class` and change their properties, with methods inspired by `d3`. For example, this would raise the shape with id `orange` and increase the brightness of all lights with class `glow`:
 
 ```javascript
-scene.selectAll('.glow').position([0, 0, 5]).style({brightness: 16.0})
+scene.select('#orange').position([-5, -5, 8])
+scene.selectAll('.glow').style({brightness: 16.0})
 ```
 
 ## methods
