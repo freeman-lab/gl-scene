@@ -3,7 +3,7 @@
 [![experimental](http://badges.github.io/stability-badges/dist/experimental.svg)](http://github.com/badges/stability-badges)
 
 
-Assemble simple 3d scenes using [`stack.gl`](http://stack.gl) components. The goal of this module is to make it easy to assemble scenes with objects and lights, at a slightly higher level of abstraction, while maintaining full flexibility and composability with the [`stack.gl`](http://stack.gl) ecosystem, including the emphasis on writing modular shader code. You can think of this module as a wrapper for [`gl-geometry`](http://github.com/stackgl/gl-geometry), [`gl-shader`](http://github.com/stackgl/gl-shader), and [`gl-mat4`](http://github.com/stackgl/gl-mat4), with an easy selector system for controlling appearences.
+Assemble simple 3d scenes using [`stack.gl`](http://stack.gl) components. The goal of this module is to make it easy to assemble and manipulate dynamic scenes with shapes and lights, at a slightly higher level of abstraction, while maintaining full flexibility and composability with the [`stack.gl`](http://stack.gl) ecosystem, including the emphasis on writing modular shader code. You can think of this module as a wrapper for [`gl-geometry`](http://github.com/stackgl/gl-geometry), [`gl-shader`](http://github.com/stackgl/gl-shader), and [`gl-mat4`](http://github.com/stackgl/gl-mat4), with an easy selector system for controlling appearences.
 
 ![christmas](gifs/christmas-wide-brighter.gif)
 
@@ -23,8 +23,8 @@ npm run example
 
 And see a more complex example with
 
-```javascript
-npm run demo <fruit | cubes | balls >
+```bash
+npm run demo < fruit | cubes | balls >
 ```
 
 ## example
@@ -46,7 +46,7 @@ var scene = require('gl-scene')(gl, {
 })
 ```
 
-A scene requires a list of shapes. It can additionally include lights and custom materials. We'll make a simple scene consisting of three spheres on a flat surface. We can set an `id` for selecting later, and we specify a `position` and/or `scale`, which gets turned into a `4x4` model matrix.
+A scene requires a list of shapes. It can additionally include lights and custom materials. We'll make a simple scene consisting of three spheres on a flat surface. We can set an `id` for selecting later, and we specify a `position` and/or `scale`, which automatically gets turned into a `4x4` model matrix.
 
 ```javascript
 var icosphere = require('icosphere')
@@ -54,24 +54,24 @@ var extrude = require('extrude')
 
 var shapes = [
   {
-    id: 'floor',
     complex: extrude([[-50, 50], [-50, -50], [50, -50], [50, 50]], {top: 0, bottom: -2}),
-    position: [0, 0, 0]
+    position: [0, 0, 0],
+    styles: {diffuse: [0.3, 0.3, 0.3]}
   },
   {
-    id: 'apple',
     complex: icosphere(4),
-    position: [8, 0, 1]
+    position: [8, 0, 1],
+    styles: {emissive: [0.8, 0.1, 0.0], diffuse: [0.1, 0.1, 0.1]}
   },
   {
-    id: 'orange',
     complex: icosphere(4),
-    position: [-5, -5, 2], scale: 2
+    position: [-5, -5, 2], scale: 2,
+    styles: {emissive: [0.9, 0.6, 0.0], diffuse: [0.1, 0.1, 0.1]}
   },
   {
-    id: 'pear',
     complex: icosphere(4),
-    position: [0, 8, 3], scale: 3
+    position: [0, 8, 3], scale: 3,
+    styles: {emissive: [0.0, 0.9, 0.1], diffuse: [0.1, 0.1, 0.1]}
   }
 ]
 ```
@@ -92,40 +92,23 @@ We didn't specify any lights, so we got the default: a white light above the ori
 
 ```javascript
 var lights = [
-  {class: 'glow', position: [0, 8, 3, 1], styles: {color: [0.0, 0.9, 0.1]}},
-  {class: 'glow', position: [8, 0, 1, 1], styles: {color: [0.8, 0.1, 0.0]}},
-  {class: 'glow', position: [-5, -5, 2, 1], styles: {color: [0.9, 0.6, 0.0]}}
+  {
+    position: [0, 8, 3, 1], 
+    styles: {color: [0.0, 0.9, 0.1], brightness: 8.0, ambient: 0.0, attenuation: 0.01}},
+  {
+    position: [8, 0, 1, 1], 
+    styles: {color: [0.8, 0.1, 0.0], brightness: 8.0, ambient: 0.0, attenuation: 0.01}},
+  {
+    position: [-5, -5, 2, 1], 
+    styles: {color: [0.9, 0.6, 0.0], brightness: 8.0, ambient: 0.0, attenuation: 0.01}}
 ]
 ```
 
-And we'll also add a styles, which provides an easy way to set properties on many lights or shapes
-
-```javascript
-var styles = [
-  '.glow': {brightness: 8.0, ambient: 0.0, attenuation: 0.01}
-]
-```
-
-Add the lights and styles to the scene and reinitialize (you always need to initialize after adding shapes or lights).
+Add the lights to the scene, reinitialize, and redraw!
 
 ```javascript
 scene.lights(lights)
-scene.styles(styles)
 scene.init()
-```
-
-Before redrawing, we're also going to update the shape styles using `select` and `style`. We'll make the floor darker, and give each sphere an emissive color matching its light. 
-
-```javascript
-scene.select('#floor').style({diffuse: [0.3, 0.3, 0.3]})
-scene.select('#apple').style({emissive: [0.8, 0.1, 0.0], diffuse: [0.1, 0.1, 0.1]})
-scene.select('#orange').style({emissive: [0.9, 0.6, 0.0], diffuse: [0.1, 0.1, 0.1]})
-scene.select('#pear').style({emissive: [0.0, 0.9, 0.1], diffuse: [0.1, 0.1, 0.1]})
-```
-
-Finally redraw the scene
-
-```javascript
 scene.draw()
 ```
 
