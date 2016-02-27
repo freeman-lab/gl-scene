@@ -24,7 +24,7 @@ npm run example
 And see a more complex example with
 
 ```javascript
-npm run demo
+npm run demo <fruit | cubes | balls >
 ```
 
 ## example
