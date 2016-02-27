@@ -118,6 +118,29 @@ Glowing fruit!
 
 See the [example](example.js) for a script that generates this image, and see the [fruit demo](demos/fruit.js) for a version that adds a moveable `camera` and uses `select` to dynamically turn the glowing on and off.
 
+## features
+
+#### stylesheet
+
+You can add a stylesheet to your scene, and give each shape and light an `id` and a `className`, which makes it easy to set or update styles. For example in the above example we could have set each light to have the class `glow` and each shape `sphere` and then set common styles using
+
+```javascript
+var stylesheet = {
+  '.glow': {brightness: 8.0, ambient: 0.0, attenuation: 0.01}
+  '.sphere': {diffuse: [0.1, 0.1, 0.1]}
+}
+
+scene.stylesheet(stylesheet)
+```
+
+#### selections
+
+You can select shapes and lights by `id` or `class` and change their properties with methods inspired by `d3`. For example, this would raise all `glow` lights and increase their brightness:
+
+```javascript
+scene.selectAll('.glow').position([0, 0, 5]).style({brightness: 16.0})
+```
+
 ## methods
 
 ### initialization
