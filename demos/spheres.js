@@ -7,12 +7,12 @@ var canvas = document.body.appendChild(document.createElement('canvas'))
 window.addEventListener('resize', fit(canvas), false)
 var gl = context(canvas, tick)
 
-var scene = require('../index.js')(gl)
+var scene = require('../index.js')(gl, {background: [0, 0, 0]})
 
 var shapes = []
 for (var i = 0; i < 200; i++) {
   shapes.push({
-    className: 'sphere',
+    class: 'sphere',
     complex: icosphere(3),
     position: [Math.random() * 20 - 10, Math.random() * 20 - 10, Math.random() * 20 - 10],
     styles: {
@@ -35,17 +35,7 @@ scene.init()
 
 var camera = orbit(canvas)
 
-var m = 0.1
-var d
-
 function tick () { 
   camera.tick()
   scene.draw(camera)
- 
-  scene.selectAll('.sphere').each(function (s) {
-    d = [Math.random() * m - m/2, Math.random() * m - m/2, Math.random() * m - m/2]
-    s.position(function (p) {
-      return [p[0] + d[0], p[1] + d[1], p[2] + d[2]]
-    })
-  })
 }

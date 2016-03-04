@@ -37,8 +37,8 @@ Scene.prototype.init = function () {
   if (!self._lights) self.lights()
   if (!self._materials) self.materials()
   self._setDefaults()
-  Shape.prototype.styles = self._styles
-  Light.prototype.styles = self._styles
+  Shape.prototype.stylesheet = self._stylesheet
+  Light.prototype.stylesheet = self._stylesheet
   if (self._shapes) self._shapes.each(function (d) {d.update()})
   if (self._lights) self._lights.each(function (d) {d.update()})
   this.ready = true
@@ -69,9 +69,9 @@ Scene.prototype._reset = function () {
   delete this._materials
 }
 
-Scene.prototype.styles = function (styles) {
+Scene.prototype.stylesheet = function (stylesheet) {
   var self = this
-  self._styles = _.extend(self._styles || {}, styles || {})
+  self._stylesheet = _.extend(self._stylesheet || {}, stylesheet || {})
 }
 
 Scene.prototype.materials = function (objects) {
@@ -96,21 +96,20 @@ Scene.prototype.shapes = function (objects) {
   var self = this
   self._reset()
 
-  var styles = {}
+  var stylesheet = {}
   var shapes = []
   _.forEach(objects, function (object, id) {
     if (!object.id) object.id = 'shape-' + id
     shapes.push(Shape(self.gl, object))
-    if (object.styles) styles['#' + object.id] = object.styles
+    if (object.styles) stylesheet['#' + object.id] = object.styles
   })
 
-  self.styles(styles)
+  self.stylesheet(stylesheet)
   self._shapes = elements(shapes)
 }
 
-Scene.prototype.lights = function (objects, styles) {
+Scene.prototype.lights = function (objects) {
   var self = this
-  styles = styles || {}
   self._reset()
 
   if (!objects) {
@@ -119,15 +118,15 @@ Scene.prototype.lights = function (objects, styles) {
     ]
   }
 
-  var styles = {}
+  var stylesheet = {}
   var lights = []
   _.forEach(objects, function (object, id) {
     if (!object.id) object.id = 'light-' + id
     lights.push(Light(object))
-    if (object.styles) styles['#' + object.id] = object.styles
+    if (object.styles) stylesheet['#' + object.id] = object.styles
   })
 
-  self.styles(styles)
+  self.stylesheet(stylesheet)
   self._lights = elements(lights)
 }
 
@@ -136,6 +135,7 @@ Scene.prototype.draw = function (camera) {
   if (!self.ready) throw Error('Scene must be initialized before drawing!')
 
   if (camera) {
+    if (camera.tick) camera.tick()
     camera.view(self.view)
     eye(self.view, self.eye)
   }
