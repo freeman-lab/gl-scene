@@ -26,8 +26,13 @@ for (var i = 0; i < 50; i++) {
 
 var lights = [
   {
-    id: 'point',
-    position: [10, 0, 0, 0],
+    id: 'point-1',
+    position: [10, 0, 0, 1],
+    styles: {intensity: 10, ambient: 0}
+  },
+  {
+    id: 'point-2',
+    position: [0, 10, 0, 0],
     styles: {intensity: 10, ambient: 0}
   }
 ]
