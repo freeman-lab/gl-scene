@@ -11,14 +11,14 @@ var gl = context(canvas, tick)
 var scene = require('../index.js')(gl, {background: [0, 0, 0]})
 
 var shapes = []
-for (var i = 0; i < 90; i++) {
+for (var i = 0; i < 50; i++) {
   shapes.push({
     class: 'cube',
-    complex: extrude([[-1, 1], [1, 1], [1, -1], [-1, -1]], {top: 1, bottom: -1}),
+    complex: extrude([[1, -1], [1, 1], [-1, 1], [-1, -1]], {top: 1, bottom: -1}),
     position: [Math.random() * 20 - 10, Math.random() * 20 - 10, Math.random() * 20 - 10],
     scale: Math.random() + 0.5,
     styles: {
-      emissive: [Math.max(Math.random(), 0.3), Math.max(Math.random(), 0.3), Math.max(Math.random(), 0.3)],
+      emissive: [0, Math.max(Math.random(), 0.3), Math.max(Math.random(), 0.3)],
       diffuse: [0.5, 0.5, 0.5]
     }
   })
@@ -27,8 +27,8 @@ for (var i = 0; i < 90; i++) {
 var lights = [
   {
     id: 'point',
-    position: [10, 0, 0, 1],
-    styles: {intensity: 5, ambient: 0}
+    position: [10, 0, 0, 0],
+    styles: {intensity: 10, ambient: 0}
   }
 ]
 
