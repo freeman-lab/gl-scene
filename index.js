@@ -101,7 +101,7 @@ Scene.prototype.shapes = function (objects) {
   _.forEach(objects, function (object, id) {
     if (!object.id) object.id = 'shape-' + id
     shapes.push(Shape(self.gl, object))
-    if (object.styles) stylesheet['#' + object.id] = object.styles
+    if (object.style) stylesheet['#' + object.id] = object.style
   })
 
   self.stylesheet(stylesheet)
@@ -123,7 +123,7 @@ Scene.prototype.lights = function (objects) {
   _.forEach(objects, function (object, id) {
     if (!object.id) object.id = 'light-' + id
     lights.push(Light(object))
-    if (object.styles) stylesheet['#' + object.id] = object.styles
+    if (object.style) stylesheet['#' + object.id] = object.style
   })
 
   self.stylesheet(stylesheet)

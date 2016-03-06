@@ -15,7 +15,7 @@ for (var i = 0; i < 200; i++) {
     class: 'sphere',
     complex: icosphere(3),
     position: [Math.random() * 20 - 10, Math.random() * 20 - 10, Math.random() * 20 - 10],
-    styles: {
+    style: {
       emissive: [Math.max(Math.random(), 0.3), 0.01, Math.max(Math.random(), 0.3)],
       diffuse: [0.9, 0.9, 0.9]
     }
@@ -25,7 +25,7 @@ for (var i = 0; i < 200; i++) {
 var lights = [
   {
     position: [0, 0, 0],
-    styles: {intensity: 5.0, ambient: 1}
+    style: {intensity: 5.0, ambient: 1}
   }
 ]
 

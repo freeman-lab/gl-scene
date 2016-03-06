@@ -18,37 +18,37 @@ var shapes = [
   {
     complex: extrude([[-50, 50], [-50, -50], [50, -50], [50, 50]], {top: 0, bottom: -2}),
     position: [0, 0, 0],
-    styles: {diffuse: [0.3, 0.3, 0.3]}
+    style: {diffuse: [0.3, 0.3, 0.3]}
   },
   {
     complex: icosphere(4),
     position: [8, 0, 1],
-    styles: {emissive: [0.8, 0.1, 0.0], diffuse: [0.1, 0.1, 0.1]}
+    style: {emissive: [0.8, 0.1, 0.0], diffuse: [0.1, 0.1, 0.1]}
   },
   {
     complex: icosphere(4),
     position: [-5, -5, 2], scale: 2,
-    styles: {emissive: [0.9, 0.6, 0.0], diffuse: [0.1, 0.1, 0.1]}
+    style: {emissive: [1.0, 1.0, 0.0], diffuse: [0.1, 0.1, 0.1]}
   },
   {
     complex: icosphere(4),
     position: [0, 8, 3], scale: 3,
-    styles: {emissive: [0.0, 0.9, 0.1], diffuse: [0.1, 0.1, 0.1]}
+    style: {emissive: [0.0, 0.9, 0.1], diffuse: [0.1, 0.1, 0.1]}
   }
 ]
 
 var lights = [
   {
     position: [0, 8, 3],
-    styles: {intensity: 8.0, ambient: 0.0, attenuation: 0.01, color: [0.0, 0.9, 0.1]}
+    style: {intensity: 8.0, ambient: 0.0, attenuation: 0.01, color: [0.0, 0.9, 0.1]}
   },
   {
     position: [8, 0, 1],
-    styles: {intensity: 8.0, ambient: 0.0, attenuation: 0.01, color: [0.8, 0.1, 0.0]}
+    style: {intensity: 8.0, ambient: 0.0, attenuation: 0.01, color: [0.8, 0.1, 0.0]}
   },
   {
     position: [-5, -5, 2],
-    styles: {intensity: 8.0, ambient: 0.0, attenuation: 0.01, color: [0.9, 0.6, 0.0]}
+    style: {intensity: 8.0, ambient: 0.0, attenuation: 0.01, color: [0.9, 0.6, 0.0]}
   }
 ]
 

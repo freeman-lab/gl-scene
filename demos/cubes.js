@@ -17,7 +17,7 @@ for (var i = 0; i < 50; i++) {
     complex: extrude([[1, -1], [1, 1], [-1, 1], [-1, -1]], {top: 1, bottom: -1}),
     position: [Math.random() * 20 - 10, Math.random() * 20 - 10, Math.random() * 20 - 10],
     scale: Math.random() + 0.5,
-    styles: {
+    style: {
       emissive: [0, Math.max(Math.random(), 0.3), Math.max(Math.random(), 0.3)],
       diffuse: [0.5, 0.5, 0.5]
     }
@@ -28,12 +28,12 @@ var lights = [
   {
     id: 'point-1',
     position: [10, 0, 0, 1],
-    styles: {intensity: 10, ambient: 0}
+    style: {intensity: 10, ambient: 0}
   },
   {
     id: 'point-2',
     position: [0, 10, 0, 0],
-    styles: {intensity: 10, ambient: 0}
+    style: {intensity: 10, ambient: 0}
   }
 ]
 
