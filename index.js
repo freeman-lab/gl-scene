@@ -15,14 +15,15 @@ module.exports = Scene
 
 function Scene (gl, opts) {
   if (!(this instanceof Scene)) return new Scene(gl, opts)
+  if (!gl) throw Error('Must provide a webgl context')
   opts = opts || {}
   this.gl = gl
   this.fov = opts.fov || Math.PI / 4
   this.near = opts.near || 0.01
   this.far = opts.far || 1000
   this.target = opts.target || [0, 0, 0]
-  this.viewer = opts.viewer || [0, -10, 30]
-  this.background = opts.background || [0.0, 0.0, 0.0]
+  this.observer = opts.observer || [0, -10, 30]
+  this.background = opts.background
 }
 
 Scene.prototype.init = function () {
@@ -33,6 +34,7 @@ Scene.prototype.init = function () {
   this.view = mat4.lookAt(mat4.create(), self.viewer, self.target, [0, 1, 0])
   this.eye = new Float32Array(3)
   eye(this.view, this.eye)
+  console.log(this.eye)
   this.lighting = {}
   if (!self._lights) self.lights()
   if (!self._materials) self.materials()
@@ -48,6 +50,7 @@ Scene.prototype._setDefaults = function () {
   var self = this
 
   self._shapes.each(function (d) {
+    if (!self._materials[d.attributes.material]) throw Error('Cannot find material: ' + d.attributes.material)
     _.defaults(d.style, self._materials[d.attributes.material].defaults)
   })
 
@@ -146,8 +149,10 @@ Scene.prototype.draw = function (camera) {
   mat4.perspective(self.projection, self.fov, self.width / self.height, self.near, self.far)
 
   self.gl.enable(self.gl.DEPTH_TEST)
-  self.gl.clearColor(self.background[0], self.background[1], self.background[2], 1)
-  self.gl.clear(self.gl.COLOR_BUFFER_BIT | self.gl.DEPTH_BUFFER_BIT)
+  if (self.background) {
+    self.gl.clearColor(self.background[0], self.background[1], self.background[2], 1)
+    self.gl.clear(self.gl.COLOR_BUFFER_BIT | self.gl.DEPTH_BUFFER_BIT)
+  }
   
   self.lighting = _.map(self._lights, 'style')
   _.merge(self.lighting, _.map(self._lights, 'attributes'))
