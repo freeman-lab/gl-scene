@@ -39,6 +39,7 @@
     "gl-geometry": "^3.1.0",
     "gl-mat3": "^1.0.0",
     "gl-mat4": "^1.1.4",
+    "gl-scene-material": "^1.0.0",
     "gl-shader": "^4.2.0",
     "gl-vec3": "^1.0.3",
     "glslify": "^5.0.2",
