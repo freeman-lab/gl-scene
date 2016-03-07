@@ -3,7 +3,7 @@
 [![experimental](http://badges.github.io/stability-badges/dist/experimental.svg)](http://github.com/badges/stability-badges)
 
 
-Simple 3d scenes using [`stack.gl`](http://stack.gl) components. The goal of this module is to make it easy to build and manipulate scenes with shapes and lights, while maintaining full flexibility and composability with the [`stack.gl`](http://stack.gl) ecosystem, including the emphasis on writing modular shader code. You can think of this module as a wrapper for [`gl-geometry`](http://github.com/stackgl/gl-geometry), [`gl-shader`](http://github.com/stackgl/gl-shader), and [`gl-mat4`](http://github.com/stackgl/gl-mat4), with a CSS style selector system for controlling appearence.
+Design and manipulate simple 3d scenes using [`stack.gl`](http://stack.gl) components. The goal of this module is to make it easy to build and manipulate scenes with shapes and lights, while maintaining full flexibility and composability with the [`stack.gl`](http://stack.gl) ecosystem, including the emphasis on writing modular shader code. You can think of this module as a wrapper for [`gl-geometry`](http://github.com/stackgl/gl-geometry), [`gl-shader`](http://github.com/stackgl/gl-shader), and [`gl-mat4`](http://github.com/stackgl/gl-mat4), with a CSS style selector system for controlling appearence.
 
 ![christmas](gifs/christmas-wide-brighter.gif)
 
@@ -106,7 +106,7 @@ var lights = [
 ]
 ```
 
-We'll also set the styles on the spheres to match our lights. For both shapes and lights can be set on construction (as above), or afterward with selectors.
+We'll also set the styles on the spheres to match our lights. For both shapes and lights can be set on construction, as we did with the lights, or afterward with selectors, as we'll do now.
 
 ```javascript
 scene.select('apple').style({emissive: [0.8, 0.1, 0.0], diffuse: [0.1, 0.1, 0.1]})
@@ -135,7 +135,7 @@ There are three key components to `gl-scene`, most of which are implemented in o
 
 #### materials
 
-Materials define the appearance of shapes, and how they interact with lights. Rather than predefine all matrials, `gl-scene` is designed so that materials can be published as npm modules! The module [`gl-scene-material`](https://github.com/freeman-lab/gl-scene-material) defines and tests a common format for materials, which is simply a shader and list of properties that can be set. You can then specify materials for shapes and add them to your scene:
+Materials define the appearance of shapes, and how they interact with lights. Rather than predefine all matrials, `gl-scene` is designed so that materials can be published as npm modules! The module [`gl-scene-material`](https://github.com/freeman-lab/gl-scene-material) defines and tests a common format for materials, which is simply a shader and list of properties that can be set. You can then specify materials for shapes by name and add them to your scene:
 
 ```javascript
 var material = require('gl-scene-normal-material')
@@ -152,7 +152,7 @@ scene.shapes(shapes)
 scene.materials({normal: material})
 ```
 
-You can use [`gl-scene-demo-material`](https://github.com/freeman-lab/gl-scene-demo-material) to easily demo your materials.
+Check out [`gl-scene-demo-material`](https://github.com/freeman-lab/gl-scene-demo-material) for easily demoing your materials.
 
 #### styles
 
@@ -168,7 +168,7 @@ scene.stylesheet(stylesheet)
 
 #### selections
 
-You can select shapes and lights by their `id` or `class` and manipulate them, with methods inspired by the visualization library `d3`. For example, the following would move the `orange` shape and increase the brightness of all `glow` lights:
+You can select shapes and lights by their `id` or `class` and manipulate them, with methods inspired by the visualization library `d3`. For example, the following would reposition the `orange` shape and increase the brightness of all `glow` lights:
 
 ```javascript
 scene.select('#orange').position([-5, -5, 8])
@@ -205,7 +205,9 @@ Initialize the scene. Checks that required properties are defined, and replaces 
 
 #### `scene.update(camera)`
 
-Update the scene's projection and view matrices using the provided `camera`, which must have a `view` method. Compatible cameras: 
+Update the scene's projection and view matrices using the provided `camera`, which must have a `view` method. 
+
+Compatible cameras: 
 - `canvas-orbit-camera`
 
 #### `scene.draw()`
@@ -216,11 +218,11 @@ Draw the scene to the `webgl` context.
 
 All manipulation proceeds by first selecting one or more elements -- shape or light -- and then changing properties.
 
-#### `scene.select(selector)`
+#### `selection = scene.select(selector)`
 
 Returns the first light or shape that matches the given tag. Selector should be of the form: `#id` or `.class`. Will first look for a matching shape, and then a matching light.
 
-#### `scene.selectAll(selector)`
+#### `selection = scene.selectAll(selector)`
 
 Returns all shapes or lights that match the given tag. Selector should be of the form: `#id` or `.class`.Will first look for matching shapes, and then matching lights.
 
