@@ -3,7 +3,7 @@
 [![experimental](http://badges.github.io/stability-badges/dist/experimental.svg)](http://github.com/badges/stability-badges)
 
 
-Simple 3d scenes using [`stack.gl`](http://stack.gl) components. The goal of this module is to make it easy to build and manipulate scenes with shapes and lights, at a slightly higher level of abstraction, while maintaining full flexibility and composability with the [`stack.gl`](http://stack.gl) ecosystem, including the emphasis on writing modular shader code. You can think of this module as a wrapper for [`gl-geometry`](http://github.com/stackgl/gl-geometry), [`gl-shader`](http://github.com/stackgl/gl-shader), and [`gl-mat4`](http://github.com/stackgl/gl-mat4), with an easy selector system for controlling appearences.
+Simple 3d scenes using [`stack.gl`](http://stack.gl) components. The goal of this module is to make it easy to build and manipulate scenes with shapes and lights, while maintaining full flexibility and composability with the [`stack.gl`](http://stack.gl) ecosystem, including the emphasis on writing modular shader code. You can think of this module as a wrapper for [`gl-geometry`](http://github.com/stackgl/gl-geometry), [`gl-shader`](http://github.com/stackgl/gl-shader), and [`gl-mat4`](http://github.com/stackgl/gl-mat4), with a CSS style selector system for controlling appearence.
 
 ![christmas](gifs/christmas-wide-brighter.gif)
 
@@ -11,23 +11,25 @@ Simple 3d scenes using [`stack.gl`](http://stack.gl) components. The goal of thi
 
 For now, clone the repo and install with
 
-```javascript
+```
 npm install
 ```
 
 See a simple example by calling
 
-```javascript
+```
 npm run example
 ```
 
 And see a more complex example with
 
 ```bash
-npm run demo < fruit | cubes | balls >
+npm run demo < fruit | cubes | spheres >
 ```
 
 ## example
+
+We'll make a simple static scene from scratch. 
 
 First get yourself a `webgl` context. There are many ways to do this, but here's an easy one.
 
@@ -37,11 +39,11 @@ var gl = require('gl-context')(canvas)
 require('canvas-fit')(canvas)
 ```
 
-Now create the scene, passing options for background color and viewer position
+Now create the scene, passing options for background color and observer position
 
 ```javascript
 var scene = require('gl-scene')(gl, {
-  viewer: [0, -18, 8], 
+  observer: [0, -18, 8], 
   background: [0.02, 0.02, 0.02]
 })
 ```
@@ -88,23 +90,23 @@ It should look like:
 
 ![example-0](pngs/example-stage-0.png)
 
-We didn't specify any lights, so we got the default: a white light above the origin. Let's make a bright colored light centered on each sphere. We define a list of lights just as we did with shapes.
+We didn't specify any lights, so we got the default: a white light above the origin. Let's make a bright colored light centered on each sphere. We define a list of lights just as we did with shapes, and set a style for each one.
 
 ```javascript
 var lights = [
   {
     position: [0, 8, 3], 
-    styles: {color: [0.0, 0.9, 0.1], brightness: 8.0, ambient: 0.0, attenuation: 0.01}},
+    style: {color: [0.0, 0.9, 0.1], brightness: 8.0, ambient: 0.0, attenuation: 0.01}},
   {
     position: [8, 0, 1], 
-    styles: {color: [0.8, 0.1, 0.0], brightness: 8.0, ambient: 0.0, attenuation: 0.01}},
+    style: {color: [0.8, 0.1, 0.0], brightness: 8.0, ambient: 0.0, attenuation: 0.01}},
   {
     position: [-5, -5, 2], 
-    styles: {color: [0.9, 0.6, 0.0], brightness: 8.0, ambient: 0.0, attenuation: 0.01}}
+    style: {color: [0.9, 0.6, 0.0], brightness: 8.0, ambient: 0.0, attenuation: 0.01}}
 ]
 ```
 
-We'll also set the styles on the spheres to match our lights.
+We'll also set the styles on the spheres to match our lights. For both shapes and lights can be set on construction (as above), or afterward with selectors.
 
 ```javascript
 scene.select('apple').style({emissive: [0.8, 0.1, 0.0], diffuse: [0.1, 0.1, 0.1]})
@@ -125,13 +127,36 @@ Glowing fruit!
 
 ![example-1](pngs/example-stage-1.png)
 
-See the [example](example.js) for a script that generates this image, and see the [fruit demo](demos/fruit.js) for a version that adds a moveable `camera` and uses `select` to dynamically turn the glowing on and off.
+See the [example](example.js) for a script that generates this image, see the [fruit demo](demos/fruit.js) for a version that adds a moveable `camera` and uses `select` to dynamically turn the glowing on and off, and see the [spheres](demos/sphere.js) and [cubes](demos/cubes.js) demos for other kinds of scenes.
 
-## features
+## components
 
-#### stylesheet
+There are three key components to `gl-scene`, most of which are implemented in other modules.
 
-Styles can be specified for each shape or light directly, but you can also add a stylesheet to your scene, and give each element an `id` and a `className`, which makes it easy to set or update styles. For example in the above example we could have set each light to have the class `glow` and set common styles using
+#### materials
+
+Materials define the appearance of shapes, and how they interact with lights. Rather than predefine all matrials, `gl-scene` is designed so that materials can be published as npm modules! The module [`gl-scene-material`](https://github.com/freeman-lab/gl-scene-material) defines and tests a common format for materials, which is simply a shader and list of properties that can be set. You can then specify materials for shapes and add them to your scene:
+
+```javascript
+var material = require('gl-scene-normal-material')
+
+var shapes = [
+  {
+    complex: icosphere(4),
+    position: [0, 0, 0],
+    material: 'normal'
+  },
+]
+
+scene.shapes(shapes)
+scene.materials({normal: material})
+```
+
+You can use [`gl-scene-demo-material`](https://github.com/freeman-lab/gl-scene-demo-material) to easily demo your materials.
+
+#### styles
+
+Styles can be specified for each shape or light directly, but you can also add a `stylesheet` to your scene, and give each element an `id` and a `class`, which makes it easy to set or update styles. For example in the above example we could have defined each light with `class: 'glow'` and set common styles using
 
 ```javascript
 var stylesheet = {
@@ -143,12 +168,14 @@ scene.stylesheet(stylesheet)
 
 #### selections
 
-You can select shapes and lights by their `id` or `class` and manipukate them, with methods inspired by `d3`. For example, the following would move the `orange` shape and increase the brightness of all `glow` lights:
+You can select shapes and lights by their `id` or `class` and manipulate them, with methods inspired by the visualization library `d3`. For example, the following would move the `orange` shape and increase the brightness of all `glow` lights:
 
 ```javascript
 scene.select('#orange').position([-5, -5, 8])
 scene.selectAll('.glow').style({brightness: 16.0})
 ```
+
+Most of this logic is handled by [`selectify`](https://github.com/freeman-lab/selectify).
 
 ## methods
 
@@ -168,17 +195,18 @@ Add a list of `lights` to the scene, alongside a set of `styles`. [expand]
 
 #### `scene.materials(materials)`
 
-Specify a list of `materials` to use. [expand]
+Specify an object of named `materials` to use. [expand]
 
 ### rendering
 
 #### `scene.init()`
 
-Initialize the scene, check that required properties are defined, and replace missing properties with defaults where possible, as follows. For shapes without a material, the material will be `flat`. If a shape has undefined material properties, they will be replaced with the defaults.
+Initialize the scene. Checks that required properties are defined, and replaces missing properties with defaults where possible, as follows. For shapes without a material, the material will be `lambert`. If a shape has undefined material properties, they will be replaced with the defaults for the material. A single light above the origin will be created.
 
 #### `scene.update(camera)`
 
-Update the scene's projection and view matrices from the provided `camera`, which must have a `view` method. For examples see: `canvas-orbit-camera`
+Update the scene's projection and view matrices using the provided `camera`, which must have a `view` method. Compatible cameras: 
+- `canvas-orbit-camera`
 
 #### `scene.draw()`
 
@@ -186,65 +214,52 @@ Draw the scene to the `webgl` context.
 
 ### manipulation
 
-All manipulation works by first selecting an element -- a shape or a light -- and then changing its properties.
+All manipulation proceeds by first selecting one or more elements -- shape or light -- and then changing properties.
 
 #### `scene.select(selector)`
 
-Returns the first `element` that matches the given tag. Selector should be of the form: `#id`, `.class`, `shape #id`, `shape .class`, `light #id`, or `light .class`. If `shape` or `light` is unspecified, will first look for a matching shape, and then a matching light.
+Returns the first light or shape that matches the given tag. Selector should be of the form: `#id` or `.class`. Will first look for a matching shape, and then a matching light.
 
+#### `scene.selectAll(selector)`
 
-#### `element.hide()`
+Returns all shapes or lights that match the given tag. Selector should be of the form: `#id` or `.class`.Will first look for matching shapes, and then matching lights.
 
-Hide the given element. For a shape, will remove it from the scene. For a light, will remove its effect on the scene.
+#### `selection.style({name: value})`
 
-#### `element.show()`
+Set one or more styles on the selection. Can provide an object pf the form `{name: value}` or `{name1: value1, name2: value2}`, or two arguments of the form `name, value`.
 
-Show the given element. For a shape, will add it back to the scene. For a light, will include its effect on the scene.
+#### `selection.classed(name, value)`
 
-#### `element.toggle()`
+Set class `name` on the selection to `value`, which should be truthy.
 
-Show or hide the given element depending on its current state.
+#### `selection.toggleClass(name)`
 
-#### `element.move(func)`
+Add or remove class `name` on the selection, depending on its current state.
 
-Move an element by providing a function `func` that should take as input a `model` matrix (for shapes) or a `position` vector (for lights), and modify it in place.
+#### `selection.hide()`
 
-```javascript
-scene.find('shape #earth').move(function (model) {mat4.translate(model, model, [0, 5, 0])})
-```
-```javascript
-scene.find('light #sun').move(function (position) {position[1] += 5})
-```
+Hide the selection. For a shape, will remove it from the scene. For a light, will remove its effect on the scene.
 
-#### `element.style({name: value})`
+#### `selection.show()`
 
-Set one or more style properties on the element.
+Show the selection. For a shape, will add it back to the scene. For a light, will include its effect on the scene.
 
-```javascript
-scene.find('shape #earth').style({emissive: [0.6, 0.2, 0.1]})
-```
-```javascript
-scene.find('light #sun').style({color: [0.5, 0.5, 0.5]})
-```
+#### `selection.toggle()`
 
-#### `element.classed(name, value)`
+Show or hide the selection depending on its current state.
 
-Set class `name` on the element to `value`, which should be truthy.
+#### `selection.position([x, y, z])`
 
-```javascript
-scene.find('shape #earth').classed('planet', false)
-```
+Set the position of the selection. Should be a length 3 vector for a shape, or a length 3 or 4 vector for a light. Can also provide a function which takes the current position as input and should return the new position.
 
-#### `element.toggleClass(name)`
+#### `selection.scale([x, y, z])`
 
-Add or remove class `name` on the given element depending on its current state.
+Set the scale of the selection. Only for shapes. Should be a length 3 vector or float (which will scale all dimensions). Can also provide a function which takes the current scale as input and should return the new scale.
 
-```javascript
-scene.find('shape #earth').toggleClass('planet')
-```
+#### `selection.rotation(angle, [axis])`
+
+Set the rotation of the selection. Only for shapes. Should provide `angle` in radians and a length 3 vector for `axis`. Can also provide a function which takes the current 3x3 rotation matrix as input and should return the new rotation.
 
 ## TODO
 
-- Make selection work on lists via a `selectAll` operator
-- Support multiple classes per element
 - Tests!
