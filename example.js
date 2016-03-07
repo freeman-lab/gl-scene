@@ -10,7 +10,7 @@ var gl = context(canvas)
 fit(canvas)
 
 var scene = require('./index.js')(gl, {
-  viewer: [0, -18, 8], 
+  observer: [0, -18, 8], 
   background: [0.02, 0.02, 0.02]
 })
 

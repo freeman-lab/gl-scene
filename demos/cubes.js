@@ -45,10 +45,12 @@ var camera = orbit(canvas)
 
 var t = 0
 
-var now = time() * 0.001
+var now, axis
 var rotate = 0.005
+
 function tick () { 
-  var axis = Math.sin(now) * 2
+  now = time() * 0.001
+  axis = Math.sin(now) * 2
   camera.rotate([0, 0, 0], [axis * rotate, -rotate, 0])
   camera.tick()
   scene.draw(camera)

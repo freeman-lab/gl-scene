@@ -8,7 +8,7 @@ var canvas = document.body.appendChild(document.createElement('canvas'))
 window.addEventListener('resize', fit(canvas), false)
 var gl = context(canvas, tick)
 
-var scene = require('../index.js')(gl)
+var scene = require('../index.js')(gl, {background: [0, 0, 0]})
 
 var shapes = [
   {
