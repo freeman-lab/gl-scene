@@ -31,7 +31,7 @@ Scene.prototype.init = function () {
   if (!self._shapes) throw Error('Cannot initialize without shapes')
   this.frame = 0
   this.projection = mat4.create()
-  this.view = mat4.lookAt(mat4.create(), self.viewer, self.target, [0, 1, 0])
+  this.view = mat4.lookAt(mat4.create(), self.observer, self.target, [0, 1, 0])
   this.eye = new Float32Array(3)
   eye(this.view, this.eye)
   console.log(this.eye)
