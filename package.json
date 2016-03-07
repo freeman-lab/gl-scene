@@ -6,8 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "npm run example",
-    "demo": "budo demo.js:bundle.js --watch",
-    "example": "budo example.js:bundle.js --watch"
+    "demo": "node demo.js",
+    "example": "budo example.js:bundle.js"
   },
   "browserify": {
     "transform": [
@@ -39,20 +39,15 @@
     "gl-geometry": "^3.1.0",
     "gl-mat3": "^1.0.0",
     "gl-mat4": "^1.1.4",
+    "gl-scene-material": "^1.0.0",
     "gl-shader": "^4.2.0",
-    "glsl-basic-light": "^1.0.0",
-    "glsl-basic-lighting": "^1.0.0",
-    "glsl-basic-material": "^1.0.0",
-    "glsl-diffuse-lambert": "^1.0.0",
-    "glsl-diffuse-oren-nayar": "^1.0.2",
-    "glsl-fog": "0.0.1",
-    "glsl-specular-blinn-phong": "^1.0.1",
+    "gl-vec3": "^1.0.3",
     "glslify": "^5.0.2",
     "inherits": "^2.0.1",
     "lodash": "^4.1.0",
     "mesh-reindex": "^1.0.0",
     "normals": "^1.0.1",
-    "selectify": "^1.0.0",
+    "selectify": "^1.1.0",
     "unindex-mesh": "^2.0.0"
   },
   "devDependencies": {
