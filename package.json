@@ -46,7 +46,7 @@
     "lodash": "^4.1.0",
     "mesh-reindex": "^1.0.0",
     "normals": "^1.0.1",
-    "selectify": "^1.0.1",
+    "selectify": "^1.1.0",
     "unindex-mesh": "^2.0.0"
   },
   "devDependencies": {
