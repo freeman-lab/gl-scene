@@ -183,15 +183,42 @@ Most of this logic is handled by [`selectify`](https://github.com/freeman-lab/se
 
 #### `scene(gl, opts)`
 
-Construct a scene by providing a `webgl` context. [expand]
+Construct a scene by providing a `webgl` context.
+
+**Options:**  
+- `gl` – A `webgl` context. **Required.**
+- `opts` is an optional object with these properties:
+  - `fov` – field of view. Default: `Math.PI / 4`
+  - `near` – Default: `0.01`
+  - `far` – Default: `1000`
+  - `target` – Default: `[0, 0, 0]`
+  - `observer` – Position for the camera view. Default: `[0, -10, 30]`
+  - `background` – An RGB color as an array of floats. Example: `[1.0, 0.0, 0.0]`
 
 #### `scene.shapes(shapes)`
 
-Add a list of `shapes` to the scene, using a set of `styles`. [expand]
+Add a list of `shapes` to the scene, using a set of `styles`.
+
+Each shape in the `shapes` array has these properties:
+
+- `id` – A string with a unique id. **Required**
+- `complex` – A 3d mesh for rendering the shape. **Required**
+- `class` – Similar to a css class, for use as a selector.
+- `material` – A material created using [gl-scene-material](https://github.com/freeman-lab/gl-scene-material) or a compatible module.
+- `position` – The initial position of the shape, provided as an array of floats: `[x, y, z]`
+- `scale` – The initial size of the shape, provided as a number or as a function that accepts an array with `x, y, z` coordinates as an argument and returns an array with `x, y, z` coordinates.
+- `style` An object with CSS-like properties for controlling the style of the shape.
 
 #### `scene.lights(lights)`
 
-Add a list of `lights` to the scene, alongside a set of `styles`. [expand]
+Add a list of `lights` to the scene, alongside a set of `styles`.
+
+Each light in the `lights` array has these properties:
+
+- `id` – A string with a unique id. **Required**
+- `position` – The initial position of the shape, provided as an array of floats: `[x, y, z]`. **Required**
+- `class` – Similar to a css class, for use as a selector.
+- `style` An object with CSS-like properties for controlling the style of the light.
 
 #### `scene.materials(materials)`
 
@@ -203,16 +230,12 @@ Specify an object of named `materials` to use. [expand]
 
 Initialize the scene. Checks that required properties are defined, and replaces missing properties with defaults where possible, as follows. For shapes without a material, the material will be `lambert`. If a shape has undefined material properties, they will be replaced with the defaults for the material. A single light above the origin will be created.
 
-#### `scene.update(camera)`
+#### `scene.draw(camera)`
 
-Update the scene's projection and view matrices using the provided `camera`, which must have a `view` method. 
+Draw the scene to the `webgl` context with an optional `camera`, which must have a `view` method. 
 
 Compatible cameras: 
-- `canvas-orbit-camera`
-
-#### `scene.draw()`
-
-Draw the scene to the `webgl` context.
+- [`canvas-orbit-camera`](https://npmjs.com/canvas-orbit-camera)
 
 ### manipulation
 
