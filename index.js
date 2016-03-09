@@ -34,7 +34,6 @@ Scene.prototype.init = function () {
   this.view = mat4.lookAt(mat4.create(), self.observer, self.target, [0, 1, 0])
   this.eye = new Float32Array(3)
   eye(this.view, this.eye)
-  console.log(this.eye)
   this.lighting = {}
   if (!self._lights) self.lights()
   if (!self._materials) self.materials()
