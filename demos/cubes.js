@@ -33,7 +33,7 @@ var lights = [
   {
     id: 'point-2',
     position: [0, 10, 0, 0],
-    style: {intensity: 10, ambient: 0}
+    style: {intensity: 4, ambient: 0}
   }
 ]
 

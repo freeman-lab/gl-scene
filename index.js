@@ -1,12 +1,13 @@
 var Material = require('gl-material')
-var Shape = require('./lib/shape.js')
-var Light = require('./lib/light.js')
+var Shape = require('gl-shape')
+var Light = require('gl-light')
 var mat4 = require('gl-mat4')
 var mat3 = require('gl-mat3')
 var eye = require('eye-vector')
 var normals = require('normals')
 var glslify = require('glslify')
 var distance = require('euclidean-distance')
+var assign = require('object-assign')
 var inherits = require('inherits')
 var selectify = require('selectify')
 var _ = require('lodash')
@@ -34,15 +35,19 @@ Scene.prototype.init = function () {
   this.view = mat4.lookAt(mat4.create(), self.observer, self.target, [0, 1, 0])
   this.eye = new Float32Array(3)
   eye(this.view, this.eye)
-  console.log(this.eye)
   this.lighting = {}
   if (!self._lights) self.lights()
   if (!self._materials) self.materials()
   self._setDefaults()
-  Shape.prototype.stylesheet = self._stylesheet
-  Light.prototype.stylesheet = self._stylesheet
-  if (self._shapes) self._shapes.each(function (d) {d.update()})
-  if (self._lights) self._lights.each(function (d) {d.update()})
+  if (self._shapes) {
+    self._shapes.each(function (d) {d.stylesheet(self._stylesheet)})
+    self._shapes.each(function (d) {d.update()})
+  }
+  if (self._lights) {
+    self._lights.each(function (d) {d.stylesheet(self._stylesheet)})
+    self._lights.each(function (d) {d.update()})
+  }
+  console.log(self._shapes)
   this.ready = true
 }
 
@@ -82,8 +87,8 @@ Scene.prototype.materials = function (objects) {
 
 	if (!objects) {
 		objects = {
-			lambert: require('gl-material-lambert'),
-      normal: require('gl-material-normal')
+			lambert: require('gl-lambert-material'),
+      normal: require('gl-normal-material')
 		}
 	} 
 
@@ -101,14 +106,17 @@ Scene.prototype.shapes = function (objects) {
 
   var stylesheet = {}
   var shapes = []
+  var shape, id, className
   _.forEach(objects, function (object, id) {
-    if (!object.id) object.id = 'shape-' + id
-    shapes.push(Shape(self.gl, object))
-    if (object.style) stylesheet['#' + object.id] = object.style
+    id = object.id = object.id || 'shape-' + id
+    className = object.className || object.class || ''
+    shape = Shape(self.gl, object)
+    shapes.push(SceneElement(shape, {id: id, className: className, type: 'shape'}))
+    if (object.style) stylesheet['#' + id] = object.style
   })
 
   self.stylesheet(stylesheet)
-  self._shapes = elements(shapes)
+  self._shapes = SceneCollection(shapes)
 }
 
 Scene.prototype.lights = function (objects) {
@@ -123,14 +131,17 @@ Scene.prototype.lights = function (objects) {
 
   var stylesheet = {}
   var lights = []
+  var light, id, className
   _.forEach(objects, function (object, id) {
-    if (!object.id) object.id = 'light-' + id
-    lights.push(Light(object))
-    if (object.style) stylesheet['#' + object.id] = object.style
+    id = object.id || 'light-' + id
+    className = object.className || object.class || ''
+    light = Light(object)
+    lights.push(SceneElement(light, {id: id, className: className, type: 'light'}))
+    if (object.style) stylesheet['#' + id] = object.style
   })
 
   self.stylesheet(stylesheet)
-  self._lights = elements(lights)
+  self._lights = SceneCollection(lights)
 }
 
 Scene.prototype.draw = function (camera) {
@@ -196,14 +207,42 @@ Scene.prototype.select = function (selector) {
   return selection
 }
 
-inherits(elements, selectify)
+function SceneElement (item, opts) {
+  if (!(this instanceof SceneElement)) return new SceneElement(item, opts)
+  var self = this
+  
+  self.update = function () {
+    style = self._stylesheet['#' + self.id]
+    if (style) assign(self.style, style)
+    self.className.split(' ').forEach(function (name) {
+      style = self._stylesheet['.' + name]
+      if (style) assign(self.style, style)
+    })
+  }
 
-function elements (items) {
-  if (!(this instanceof elements)) return new elements(items)
-  elements.super_.call(this, items)
+  self.stylesheet = function (stylesheet) {
+    self._stylesheet = stylesheet
+  }
+
+  self.type = opts.type
+  self.id = opts.id
+  self.className = opts.class || opts.className || ''
+
+  self.style = {}
+  self.attributes = item.attributes
+  self.position = item.position
+  self.scale = item.scale
+  self.rotation = item.rotation
 }
 
-_.assign(elements.prototype, {
+inherits(SceneCollection, selectify)
+
+function SceneCollection (elements) {
+  if (!(this instanceof SceneCollection)) return new SceneCollection(elements)
+  SceneCollection.super_.call(this, elements)
+}
+
+assign(SceneCollection.prototype, {
   show: function () {
     return this.each(function (d) {
       d.attributes.visible = true
@@ -240,4 +279,3 @@ _.assign(elements.prototype, {
     })
   }
 })
-
