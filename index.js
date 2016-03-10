@@ -47,7 +47,6 @@ Scene.prototype.init = function () {
     self._lights.each(function (d) {d.stylesheet(self._stylesheet)})
     self._lights.each(function (d) {d.update()})
   }
-  console.log(self._shapes)
   this.ready = true
 }
 
