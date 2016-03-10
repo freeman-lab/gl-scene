@@ -1,4 +1,4 @@
-var Material = require('gl-scene-material')
+var Material = require('gl-material')
 var Shape = require('./lib/shape.js')
 var Light = require('./lib/light.js')
 var mat4 = require('gl-mat4')
@@ -34,6 +34,7 @@ Scene.prototype.init = function () {
   this.view = mat4.lookAt(mat4.create(), self.observer, self.target, [0, 1, 0])
   this.eye = new Float32Array(3)
   eye(this.view, this.eye)
+  console.log(this.eye)
   this.lighting = {}
   if (!self._lights) self.lights()
   if (!self._materials) self.materials()
@@ -81,8 +82,8 @@ Scene.prototype.materials = function (objects) {
 
 	if (!objects) {
 		objects = {
-			lambert: require('gl-scene-lambert-material'),
-      normal: require('gl-scene-normal-material')
+			lambert: require('gl-material-lambert'),
+      normal: require('gl-material-normal')
 		}
 	} 
 
