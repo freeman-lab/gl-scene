@@ -1,14 +1,14 @@
 var Material = require('gl-material')
-var Shape = require('./lib/shape.js')
-var Light = require('./lib/light.js')
+var Shape = require('gl-shape')
+var Light = require('gl-light')
 var mat4 = require('gl-mat4')
 var mat3 = require('gl-mat3')
 var eye = require('eye-vector')
 var normals = require('normals')
 var glslify = require('glslify')
 var distance = require('euclidean-distance')
-var inherits = require('inherits')
-var selectify = require('selectify')
+var element = require('./lib/element')
+var collection = require('./lib/collection')
 var _ = require('lodash')
 
 module.exports = Scene
@@ -34,15 +34,18 @@ Scene.prototype.init = function () {
   this.view = mat4.lookAt(mat4.create(), self.observer, self.target, [0, 1, 0])
   this.eye = new Float32Array(3)
   eye(this.view, this.eye)
-  console.log(this.eye)
   this.lighting = {}
   if (!self._lights) self.lights()
   if (!self._materials) self.materials()
   self._setDefaults()
-  Shape.prototype.stylesheet = self._stylesheet
-  Light.prototype.stylesheet = self._stylesheet
-  if (self._shapes) self._shapes.each(function (d) {d.update()})
-  if (self._lights) self._lights.each(function (d) {d.update()})
+  if (self._shapes) {
+    self._shapes.each(function (d) {d.stylesheet(self._stylesheet)})
+    self._shapes.each(function (d) {d.update()})
+  }
+  if (self._lights) {
+    self._lights.each(function (d) {d.stylesheet(self._stylesheet)})
+    self._lights.each(function (d) {d.update()})
+  }
   this.ready = true
 }
 
@@ -101,14 +104,17 @@ Scene.prototype.shapes = function (objects) {
 
   var stylesheet = {}
   var shapes = []
+  var shape, id, className
   _.forEach(objects, function (object, id) {
-    if (!object.id) object.id = 'shape-' + id
-    shapes.push(Shape(self.gl, object))
-    if (object.style) stylesheet['#' + object.id] = object.style
+    id = object.id = object.id || 'shape-' + id
+    className = object.className || object.class || ''
+    shape = Shape(self.gl, object)
+    shapes.push(element(shape, {id: id, className: className, type: 'shape'}))
+    if (object.style) stylesheet['#' + id] = object.style
   })
 
   self.stylesheet(stylesheet)
-  self._shapes = elements(shapes)
+  self._shapes = collection(shapes)
 }
 
 Scene.prototype.lights = function (objects) {
@@ -123,14 +129,17 @@ Scene.prototype.lights = function (objects) {
 
   var stylesheet = {}
   var lights = []
+  var light, id, className
   _.forEach(objects, function (object, id) {
-    if (!object.id) object.id = 'light-' + id
-    lights.push(Light(object))
-    if (object.style) stylesheet['#' + object.id] = object.style
+    id = object.id || 'light-' + id
+    className = object.className || object.class || ''
+    light = Light(object)
+    lights.push(element(light, {id: id, className: className, type: 'light'}))
+    if (object.style) stylesheet['#' + id] = object.style
   })
 
   self.stylesheet(stylesheet)
-  self._lights = elements(lights)
+  self._lights = collection(lights)
 }
 
 Scene.prototype.draw = function (camera) {
@@ -195,49 +204,3 @@ Scene.prototype.select = function (selector) {
   if (!selection) throw Error('No matching items for: ' + selector)
   return selection
 }
-
-inherits(elements, selectify)
-
-function elements (items) {
-  if (!(this instanceof elements)) return new elements(items)
-  elements.super_.call(this, items)
-}
-
-_.assign(elements.prototype, {
-  show: function () {
-    return this.each(function (d) {
-      d.attributes.visible = true
-    })
-  },
-
-  hide: function () {
-    return this.each(function (d) {
-      d.attributes.visible = false
-    })
-  },
-
-  toggle: function () {
-    return this.each(function (d) {
-      d.attributes.visible ? d.attributes.visible = false : d.attributes.visible = true
-    })
-  },
-
-  position: function (value) {
-    return this.each(function (d) {
-      d.position(value)
-    })
-  },
-
-  scale: function (value) {
-    return this.each(function (d) {
-      d.scale(value)
-    })
-  },
-
-  rotation: function (value, axis) {
-    return this.each(function (d) {
-      d.rotation(value, axis)
-    })
-  }
-})
-
