@@ -7,8 +7,9 @@ var eye = require('eye-vector')
 var normals = require('normals')
 var glslify = require('glslify')
 var distance = require('euclidean-distance')
-var element = require('./lib/element')
-var collection = require('./lib/collection')
+var assign = require('object-assign')
+var inherits = require('inherits')
+var selectify = require('selectify')
 var _ = require('lodash')
 
 module.exports = Scene
@@ -46,6 +47,7 @@ Scene.prototype.init = function () {
     self._lights.each(function (d) {d.stylesheet(self._stylesheet)})
     self._lights.each(function (d) {d.update()})
   }
+  console.log(self._shapes)
   this.ready = true
 }
 
@@ -85,8 +87,8 @@ Scene.prototype.materials = function (objects) {
 
 	if (!objects) {
 		objects = {
-			lambert: require('gl-material-lambert'),
-      normal: require('gl-material-normal')
+			lambert: require('gl-lambert-material'),
+      normal: require('gl-normal-material')
 		}
 	} 
 
@@ -109,12 +111,12 @@ Scene.prototype.shapes = function (objects) {
     id = object.id = object.id || 'shape-' + id
     className = object.className || object.class || ''
     shape = Shape(self.gl, object)
-    shapes.push(element(shape, {id: id, className: className, type: 'shape'}))
+    shapes.push(SceneElement(shape, {id: id, className: className, type: 'shape'}))
     if (object.style) stylesheet['#' + id] = object.style
   })
 
   self.stylesheet(stylesheet)
-  self._shapes = collection(shapes)
+  self._shapes = SceneCollection(shapes)
 }
 
 Scene.prototype.lights = function (objects) {
@@ -134,12 +136,12 @@ Scene.prototype.lights = function (objects) {
     id = object.id || 'light-' + id
     className = object.className || object.class || ''
     light = Light(object)
-    lights.push(element(light, {id: id, className: className, type: 'light'}))
+    lights.push(SceneElement(light, {id: id, className: className, type: 'light'}))
     if (object.style) stylesheet['#' + id] = object.style
   })
 
   self.stylesheet(stylesheet)
-  self._lights = collection(lights)
+  self._lights = SceneCollection(lights)
 }
 
 Scene.prototype.draw = function (camera) {
@@ -204,3 +206,76 @@ Scene.prototype.select = function (selector) {
   if (!selection) throw Error('No matching items for: ' + selector)
   return selection
 }
+
+function SceneElement (item, opts) {
+  if (!(this instanceof SceneElement)) return new SceneElement(item, opts)
+  var self = this
+  
+  self.update = function () {
+    style = self._stylesheet['#' + self.id]
+    if (style) assign(self.style, style)
+    self.className.split(' ').forEach(function (name) {
+      style = self._stylesheet['.' + name]
+      if (style) assign(self.style, style)
+    })
+  }
+
+  self.stylesheet = function (stylesheet) {
+    self._stylesheet = stylesheet
+  }
+
+  self.type = opts.type
+  self.id = opts.id
+  self.className = opts.class || opts.className || ''
+
+  self.style = {}
+  self.attributes = item.attributes
+  self.position = item.position
+  self.scale = item.scale
+  self.rotation = item.rotation
+}
+
+inherits(SceneCollection, selectify)
+
+function SceneCollection (elements) {
+  if (!(this instanceof SceneCollection)) return new SceneCollection(elements)
+  SceneCollection.super_.call(this, elements)
+}
+
+assign(SceneCollection.prototype, {
+  show: function () {
+    return this.each(function (d) {
+      d.attributes.visible = true
+    })
+  },
+
+  hide: function () {
+    return this.each(function (d) {
+      d.attributes.visible = false
+    })
+  },
+
+  toggle: function () {
+    return this.each(function (d) {
+      d.attributes.visible ? d.attributes.visible = false : d.attributes.visible = true
+    })
+  },
+
+  position: function (value) {
+    return this.each(function (d) {
+      d.position(value)
+    })
+  },
+
+  scale: function (value) {
+    return this.each(function (d) {
+      d.scale(value)
+    })
+  },
+
+  rotation: function (value, axis) {
+    return this.each(function (d) {
+      d.rotation(value, axis)
+    })
+  }
+})
