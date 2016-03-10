@@ -7,12 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "npm run example",
     "demo": "node demo.js",
-    "example": "budo example.js:bundle.js"
-  },
-  "browserify": {
-    "transform": [
-      "glslify"
-    ]
+    "example": "budo example.js"
   },
   "repository": {
     "type": "git",
@@ -47,17 +42,15 @@
     "lodash": "^4.1.0",
     "mesh-reindex": "^1.0.0",
     "normals": "^1.0.1",
+    "object-assign": "^4.0.1",
     "selectify": "^1.1.0",
     "unindex-mesh": "^2.0.0"
   },
   "devDependencies": {
-    "browserify": "~12.0.0",
     "budo": "~7.0.0",
     "canvas-fit": "^1.5.0",
     "canvas-orbit-camera": "^1.0.2",
     "extrude": "^1.0.1",
-    "fps": "0.0.3",
-    "gl-now": "^1.4.0",
     "icosphere": "^1.0.0"
   }
 }
