@@ -220,7 +220,11 @@ Set the rotation of the selection. Only for shapes. Should provide `angle` in ra
 
 ## comparisons
 
-Everything here can be done using lower-level [`stack.gl`](http://stack.gl) components directly, and if you know what you're doing that will always be a more flexible approach! But hopefully this module provides some useful abstractions that make it easier to get started (if you're new), and make easier to reason about complex scenes. Compared to [`three.js`](http://threejs.org/), this approach, and `stack.gl` in general, favors small modules and composition over complex class hierarchies and bundling everythng together. For example, rather than predefine a class hierarchy of materials, `gl-scene` and `gl-material` encourage publishing materials as individual, versioned npm modules. But `three.js` is an awesome project and might be exactly what you want! It currently offers way more functionality, especially for things like complex lighting and shadow mapping, though hopefully we can add some of that with new modules.
+How does this module compare to other approaches?
+
+Everything here can be done using lower-level [`stack.gl`](http://stack.gl) components directly, and if you know what you're doing that will always be a more flexible approach! But hopefully this module provides some useful abstractions that make it easier to get started (if you're new), and make easier to reason about complex scenes. 
+
+Compared to [`three.js`](http://threejs.org/), this approach, and `stack.gl` in general, favors small modules and composition over complex class hierarchies and bundling everythng together. For example, rather than predefine a class hierarchy of materials, `gl-scene` and `gl-material` encourage publishing materials as individual, versioned npm modules. But `three.js` is an awesome project and might be exactly what you want! It currently offers way more functionality, especially for things like complex lighting and shadow mapping, though hopefully we can add some of that with new modules.
 
 [npm-image]: https://img.shields.io/badge/npm-v1.0.0-lightgray.svg?style=flat-square
 [npm-url]: https://npmjs.org/package/gl-scene
