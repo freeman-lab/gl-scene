@@ -130,6 +130,7 @@ Add a list of `shapes` to the scene.
 
 Each shape in the `shapes` array has these properties:
 - `complex` a 3d mesh for rendering the shape, must define `positions` and `faces`, can define `normals` and `uvs` **required**
+- `flatten` whether to flatten the mesh, default `true`
 - `material` a material name, default `lambert`
 - `position` iniitial position of the shape as an array of floats, default `[0, 0, 0]`
 - `scale` initial scale of the shape as a number or an array of floats, default `1`
