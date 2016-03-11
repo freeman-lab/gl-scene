@@ -18,7 +18,7 @@ npm install gl-scene
 
 ## example
 
-We'll make a very simple scene with a bunny lit by a green light. 
+We'll make a very simple scene with a bunny bathed in blue light.
 
 First get yourself a `webgl` context. There are many ways to do this, but here's an easy one.
 
@@ -36,7 +36,7 @@ var scene = require('./index.js')(gl, {
 })
 ```
 
-No add a shape and a light
+Now add a shape and a light
 
 ```javascript
 var shapes = [{
@@ -47,7 +47,8 @@ var shapes = [{
 }]
 
 var lights = [{
-  position: [0, 0, 20], style: {intensity: 8.0, color: [0.2, 0.7, 0.2]}
+  position: [0, 0, 20], 
+  style: {intensity: 10.0, color: [0.2, 0.5, 0.9]}
 }]
 
 scene.shapes(shapes)
@@ -61,15 +62,15 @@ scene.init()
 scene.draw()
 ```
 
-See the [example](example.js) for a slightly more involved scene, and see the [fruit](demos/fruit.js) • [spheres](demos/spheres.js) • [cubes](demos/cubes.js) demos for behaviors like selection, updating, and camera integration.
+See [example.js](example.js) for a slightly more complex scene, and see the [fruit](demos/fruit.js) • [spheres](demos/spheres.js) • [cubes](demos/cubes.js) demos for behaviors like selection, updates, stylesheets, cameras, and more!
 
 ## components
 
-There are three key concepts used in `gl-scene`, most of which are implemented in other modules.
+There are three key components used by `gl-scene`, most of which are implemented in other modules.
 
 #### materials
 
-Materials define the appearance of shapes, and how they interact with lights. Rather than predefine all matrials, `gl-material` is designed so that materials can be published as npm modules! The module [`gl-material`](https://github.com/freeman-lab/gl-material) defines and tests a common format for materials, which is simply a shader and list of properties that can be set. You can then specify materials for shapes by name and add them to your scene:
+Materials define the appearance of shapes, and how they interact with lights. Rather than predefine all matrials, we want lots of different materials to be published as npm modules! The module [`gl-material`](https://github.com/freeman-lab/gl-material) defines a common format for materials, which is simply a shader and list of style properties that can be set on it. You can then specify materials for shapes by name and add them to your scene:
 
 ```javascript
 var material = require('gl-normal-material')
@@ -86,9 +87,11 @@ scene.shapes(shapes)
 scene.materials({normal: material})
 ```
 
+For convienence, some common material are included with `gl-scene` by default.
+
 #### styles
 
-Styles can be specified for each shape or light directly, but you can also add a `stylesheet` to your scene, and give each element an `id` and a `class`, which makes it easy to set or update styles. For example in the above example we could have defined each light with `class: 'glow'` and set common styles using
+Styles can be specified for each shape or light directly, but you can also add a `stylesheet` to your scene, and give each element an `id` and a `class`. This makes it easy to set or update styles, just like in CSS. For example in the above example we could have defined each light with `class: 'glow'` and set common styles using
 
 ```javascript
 var stylesheet = {
@@ -115,42 +118,42 @@ Most of this logic is handled by [`selectify`](https://github.com/freeman-lab/se
 
 #### `scene(gl, opts)`
 
-Construct a scene by providing a `webgl` context.
+Construct a scene by providing a `webgl` context as `gl` and optional parameters as `opts`. 
 
-**Options:**  
-- `gl` – A `webgl` context. **Required.**
-- `opts` is an optional object with these properties:
-  - `fov` – field of view. Default: `Math.PI / 4`
-  - `near` – Default: `0.01`
-  - `far` – Default: `1000`
-  - `target` – Default: `[0, 0, 0]`
-  - `observer` – Position for the camera view. Default: `[0, -10, 30]`
-  - `background` – An RGB color as an array of floats. Example: `[1.0, 0.0, 0.0]`
+The options are:
+- `fov` field of view, default `Math.PI / 4`
+- `near` near distance, default `0.01`
+- `far` far distance, default `1000`
+- `target` target for default view, default `[0, 0, 0]`
+- `observer` camera position for default view, fefault `[0, -10, 30]`
+- `background` background color in RGB, if provided will clear on draw
 
 #### `scene.shapes(shapes)`
 
-Add a list of `shapes` to the scene, using a set of `styles`.
+Add a list of `shapes` to the scene.
 
 Each shape in the `shapes` array has these properties:
+- `complex` a 3d mesh for rendering the shape. **Required**
+- `id` a string with a unique id for use as a selector, default `shape-<index>`
+- `class` similar to a css class for use as a selector, default `none`
+- `material` a material created using [gl-material](https://github.com/freeman-lab/gl-material) or a compatible module, default `lambert`
+- `position` iniitial position of the shape as an array of floats, default `[0, 0, 0]`
+- `scale` initial scale of the shape as a number or an array of floats, default `1`
+- `style` an object with CSS-like properties for controlling the style of the shape
 
-- `id` – A string with a unique id. **Required**
-- `complex` – A 3d mesh for rendering the shape. **Required**
-- `class` – Similar to a css class, for use as a selector.
-- `material` – A material created using [gl-scene-material](https://github.com/freeman-lab/gl-scene-material) or a compatible module.
-- `position` – The initial position of the shape, provided as an array of floats: `[x, y, z]`
-- `scale` – The initial size of the shape, provided as a number or as a function that accepts an array with `x, y, z` coordinates as an argument and returns an array with `x, y, z` coordinates.
-- `style` An object with CSS-like properties for controlling the style of the shape.
+See [`gl-shape`](https://github.com/freeman-lab/gl-shape) for more details on the core implementation.
 
 #### `scene.lights(lights)`
 
-Add a list of `lights` to the scene, alongside a set of `styles`.
+Add a list of `lights` to the scene. 
 
 Each light in the `lights` array has these properties:
+- `id` a string with a unique id for use as a selector, default `light-<index>`
+- `position` initial position of the shape as an array of floats, default `[0, 0, 0]`
+- `class` similar to a css class, for use as a selector, default `none`
+- `style` an object with CSS-like properties for controlling the style of the light
 
-- `id` – A string with a unique id. **Required**
-- `position` – The initial position of the shape, provided as an array of floats: `[x, y, z]`. **Required**
-- `class` – Similar to a css class, for use as a selector.
-- `style` An object with CSS-like properties for controlling the style of the light.
+See [`gl-light`](https://github.com/freeman-lab/gl-light) for more details on the core implementation.
 
 #### `scene.materials(materials)`
 
@@ -160,7 +163,7 @@ Specify an object of named `materials` to use. [expand]
 
 #### `scene.init()`
 
-Initialize the scene. Checks that required properties are defined, and replaces missing properties with defaults where possible, as follows. For shapes without a material, the material will be `lambert`. If a shape has undefined material properties, they will be replaced with the defaults for the material. A single light above the origin will be created.
+Initialize the scene. Checks that required properties are defined, and replaces missing properties with defaults where possible. If a shape has undefined material properties, they will be replaced with the defaults for the material. Because some materials require a light to be specified, a single light above the origin will be created.
 
 #### `scene.draw(camera)`
 
@@ -171,27 +174,24 @@ Compatible cameras:
 
 ### manipulation
 
-All manipulation proceeds by first selecting one or more elements -- shape or light -- and then changing properties.
+All manipulation proceeds by selecting one or more shapes or lights by `id` or `class` and then changing properties.
 
 #### `selection = scene.select(selector)`
-
-Returns the first light or shape that matches the given tag. Selector should be of the form: `#id` or `.class`. Will first look for a matching shape, and then a matching light.
-
 #### `selection = scene.selectAll(selector)`
 
-Returns all shapes or lights that match the given tag. Selector should be of the form: `#id` or `.class`.Will first look for matching shapes, and then matching lights.
+Returns the first light or shape that matches the given tag. Selector should be of the form: `#id` or `.class`. Will first look for a matching shape, and then a matching light. `select` returns one element, whereas `selectAll` returns many.
 
 #### `selection.style({name: value})`
 
-Set one or more styles on the selection. Can provide an object pf the form `{name: value}` or `{name1: value1, name2: value2}`, or two arguments of the form `name, value`.
+Set one or more styles on the selection. Can provide an object of the form `{name: value}` or `{name1: value1, name2: value2}`, or two arguments of the form `name, value`.
 
 #### `selection.classed(name, value)`
 
-Set class `name` on the selection to `value`, which should be truthy.
+Set class `name` on the selection to `value`, which should be truthy. If only `name` is specified, will return the current class.
 
 #### `selection.toggleClass(name)`
 
-Add or remove class `name` on the selection, depending on its current state.
+Add or remove class `name` on the selection, given its current setting.
 
 #### `selection.hide()`
 
@@ -203,19 +203,19 @@ Show the selection. For a shape, will add it back to the scene. For a light, wil
 
 #### `selection.toggle()`
 
-Show or hide the selection depending on its current state.
+Show or hide the selection given its current state.
 
 #### `selection.position([x, y, z])`
 
-Set the position of the selection. Should be a length 3 vector for a shape, or a length 3 or 4 vector for a light. Can also provide a function which takes the current position as input and should return the new position.
+Set the position of the selection. Should be a length 3 vector for a shape, or a length 3 or 4 vector for a light. Can also provide a function which takes the current position as input and returns a new position.
 
 #### `selection.scale([x, y, z])`
 
-Set the scale of the selection. Only for shapes. Should be a length 3 vector or float (which will scale all dimensions). Can also provide a function which takes the current scale as input and should return the new scale.
+Set the scale of the selection. Only for shapes. Should be a length 3 vector or float (which will scale all dimensions). Can also provide a function which takes the current scale as input and returns a new scale.
 
 #### `selection.rotation(angle, [axis])`
 
-Set the rotation of the selection. Only for shapes. Should provide `angle` in radians and a length 3 vector for `axis`. Can also provide a function which takes the current 3x3 rotation matrix as input and should return the new rotation.
+Set the rotation of the selection. Only for shapes. Should provide `angle` in radians and a length 3 vector for `axis`. Can also provide a function which takes the current 3x3 rotation matrix as input returns a new rotation matrix.
 
 [npm-image]: https://img.shields.io/badge/npm-v1.0.0-lightgray.svg?style=flat-square
 [npm-url]: https://npmjs.org/package/gl-scene
