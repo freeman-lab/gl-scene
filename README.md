@@ -20,25 +20,21 @@ npm install gl-scene
 
 We'll make a very simple scene with a bunny bathed in blue light.
 
-First get yourself a `webgl` context. There are many ways to do this, but here's an easy one.
-
 ```javascript
+// First get yourself a `webgl` context. There are many ways to do this, but here's an easy one.
+
 var canvas = document.body.appendChild(document.createElement('canvas'))
 var gl = require('gl-context')(canvas)
 require('canvas-fit')(canvas)
-```
 
-Create the scene by passing options for background color:
+// Create the scene by passing options for background color:
 
-```javascript
 var scene = require('gl-scene')(gl, {
   background: [0.02, 0.02, 0.02]
 })
-```
 
-Now add a shape and a light
+// Now add a shape and a light
 
-```javascript
 var shapes = [{
   complex: require('bunny'),
   position: [0, -8, 12],
@@ -53,11 +49,9 @@ var lights = [{
 
 scene.shapes(shapes)
 scene.lights(lights)
-```
 
-And initialize and draw the scene
+// And initialize and draw the scene
 
-```javascript
 scene.init()
 scene.draw()
 ```
