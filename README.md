@@ -91,11 +91,11 @@ For convienence, some common material are included with `gl-scene` by default.
 
 #### styles
 
-Styles can be specified for each shape or light directly, but you can also add a `stylesheet` to your scene, and give each element an `id` and a `class`. This makes it easy to set or update styles, just like in CSS. For example in the above example we could have defined each light with `class: 'glow'` and set common styles using
+Styles can be specified for each shape or light directly, but you can also add a `stylesheet` to your scene, and give each element an `id` and a `class`. This makes it easy to set or update styles, just like in CSS. For example in the above example we could have defined our light with `class: 'blue'` and set styles using
 
 ```javascript
 var stylesheet = {
-  '.glow': {brightness: 8.0, ambient: 0.0, attenuation: 0.01}
+  '.blue': {intensity: 10.0, color: [0.2, 0.5, 0.9]}
 }
 
 scene.stylesheet(stylesheet)
@@ -103,11 +103,11 @@ scene.stylesheet(stylesheet)
 
 #### selections
 
-You can select shapes and lights by their `id` or `class` and manipulate them, with methods inspired by the visualization library `d3`. For example, the following would reposition the `orange` shape and increase the brightness of all `glow` lights:
+You can select shapes and lights by their `id` or `class` and manipulate them, with methods inspired by the visualization library `d3`. For example, the following would move the `bunny` shape and double the brightness of any `blue` lights:
 
 ```javascript
-scene.select('#orange').position([-5, -5, 8])
-scene.selectAll('.glow').style({brightness: 16.0})
+scene.select('#bunny').position([-5, -5, 8])
+scene.selectAll('.blue').style({brightness: 20.0})
 ```
 
 Most of this logic is handled by [`selectify`](https://github.com/freeman-lab/selectify).
@@ -133,12 +133,12 @@ The options are:
 Add a list of `shapes` to the scene.
 
 Each shape in the `shapes` array has these properties:
-- `complex` a 3d mesh for rendering the shape. **Required**
-- `id` a string with a unique id for use as a selector, default `shape-<index>`
-- `class` similar to a css class for use as a selector, default `none`
-- `material` a material created using [gl-material](https://github.com/freeman-lab/gl-material) or a compatible module, default `lambert`
+- `complex` a 3d mesh for rendering the shape **required**
+- `material` a material name, default `lambert`
 - `position` iniitial position of the shape as an array of floats, default `[0, 0, 0]`
 - `scale` initial scale of the shape as a number or an array of floats, default `1`
+- `id` a string with a unique id for use as a selector, default `shape-<index>`
+- `class` similar to a css class for use as a selector, default `none`
 - `style` an object with CSS-like properties for controlling the style of the shape
 
 See [`gl-shape`](https://github.com/freeman-lab/gl-shape) for more details on the core implementation.
@@ -148,8 +148,8 @@ See [`gl-shape`](https://github.com/freeman-lab/gl-shape) for more details on th
 Add a list of `lights` to the scene. 
 
 Each light in the `lights` array has these properties:
-- `id` a string with a unique id for use as a selector, default `light-<index>`
 - `position` initial position of the shape as an array of floats, default `[0, 0, 0]`
+- `id` a string with a unique id for use as a selector, default `light-<index>`
 - `class` similar to a css class, for use as a selector, default `none`
 - `style` an object with CSS-like properties for controlling the style of the light
 
@@ -163,13 +163,13 @@ Specify an object of named `materials` to use. [expand]
 
 #### `scene.init()`
 
-Initialize the scene. Checks that required properties are defined, and replaces missing properties with defaults where possible. If a shape has undefined material properties, they will be replaced with the defaults for the material. Because some materials require a light to be specified, a single light above the origin will be created.
+Initialize the scene. Checks that required properties are defined, and replaces missing properties with defaults where possible. If a shape has undefined styles, they will be replaced with the defaults for the material. Undefined light styles will be set as for a white point light. Because some materials require a light to be specified, a single light above the origin will be created.
 
 #### `scene.draw(camera)`
 
-Draw the scene to the `webgl` context with an optional `camera`, which must have a `view` method. 
+Draw the scene to the `webgl` context with an optional `camera`. 
 
-Compatible cameras: 
+The `camera` must have a `view` method. The following are supported:
 - [`canvas-orbit-camera`](https://npmjs.com/canvas-orbit-camera)
 
 ### manipulation
