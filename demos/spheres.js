@@ -58,5 +58,5 @@ function tick () {
 function swirl (p, r, t) {
   var dx = Math.sin(t + r)
   var dy = Math.cos(t + r)
-  return [p[0] + dx, p[1] + dy, p[2]]
+  return [p[0] + dx, p[1] + dy, p[2] + dx + dy]
 }
