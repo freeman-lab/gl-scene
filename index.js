@@ -15,9 +15,9 @@ function Scene (gl, opts) {
   if (!gl) throw Error('Must provide a webgl context')
   opts = opts || {}
   this.gl = gl
-  this.fov = opts.fov || Math.PI / 4
-  this.near = opts.near || 0.01
-  this.far = opts.far || 1000
+  this.fov = _.isNumber(opts.fov) ? opts.fov : Math.PI / 4
+  this.near = _.isNumber(opts.near) ? opts.near : 0.01
+  this.far = _.isNumber(opts.far) ? opts.far : 1000
   this.target = opts.target || [0, 0, 0]
   this.observer = opts.observer || [0, -10, 30]
   this.background = opts.background
@@ -34,6 +34,7 @@ Scene.prototype.init = function () {
   this.lighting = {}
   if (!self._lights) self.lights()
   if (!self._materials) self.materials()
+  if (!self._stylesheet) self.stylesheet()
   self._setDefaults()
   if (self._shapes) {
     self._shapes.each(function (d) {d.stylesheet(self._stylesheet)})
@@ -88,8 +89,10 @@ Scene.prototype.materials = function (objects) {
 	} 
 
   var materials = {}
+  var constants = {}
   _.forEach(objects, function (object, key) {
-    materials[key] = Material(self.gl, object, {LIGHTCOUNT: self._lights.length})
+    if (self._lights) constants = {LIGHTCOUNT: self._lights.length}
+    materials[key] = Material(self.gl, object, constants)
   })
 
 	self._materials = materials

@@ -4,7 +4,7 @@
   "description": "assemble simple 3d scenes using stack.gl",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "browserify test.js | testron | tap-spec",
     "start": "budo example.js",
     "demo": "node demo.js"
   },
@@ -40,12 +40,17 @@
     "selectify": "^1.1.0"
   },
   "devDependencies": {
+    "browserify": "^13.0.0",
     "budo": "~7.0.0",
     "bunny": "^1.0.1",
     "canvas-fit": "^1.5.0",
     "canvas-orbit-camera": "^1.0.2",
     "extrude": "^1.0.1",
     "gl-context": "^0.1.1",
-    "icosphere": "^1.0.0"
+    "icosphere": "^1.0.0",
+    "tap-spec": "^4.1.1",
+    "tape": "^4.5.1",
+    "test-allclose": "^1.1.0",
+    "testron": "^1.2.0"
   }
 }
