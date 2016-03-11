@@ -29,7 +29,7 @@
   "dependencies": {
     "eye-vector": "0.0.0",
     "gl-lambert-material": "^1.0.1",
-    "gl-light": "^1.0.0",
+    "gl-light": "^1.1.0",
     "gl-mat4": "^1.1.4",
     "gl-material": "^1.0.0",
     "gl-normal-material": "^1.0.0",
