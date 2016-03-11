@@ -28,29 +28,22 @@
   },
   "homepage": "https://github.com/freeman-lab/gl-scene#readme",
   "dependencies": {
-    "euclidean-distance": "^1.0.0",
     "eye-vector": "0.0.0",
-    "gl-context": "^0.1.1",
-    "gl-geometry": "^3.1.0",
-    "gl-mat3": "^1.0.0",
+    "gl-light": "^1.0.0",
     "gl-mat4": "^1.1.4",
     "gl-material": "^1.0.0",
-    "gl-shader": "^4.2.0",
-    "gl-vec3": "^1.0.3",
-    "glslify": "^5.0.2",
+    "gl-shape": "^1.0.1",
     "inherits": "^2.0.1",
     "lodash": "^4.1.0",
-    "mesh-reindex": "^1.0.0",
-    "normals": "^1.0.1",
     "object-assign": "^4.0.1",
-    "selectify": "^1.1.0",
-    "unindex-mesh": "^2.0.0"
+    "selectify": "^1.1.0"
   },
   "devDependencies": {
     "budo": "~7.0.0",
     "canvas-fit": "^1.5.0",
     "canvas-orbit-camera": "^1.0.2",
     "extrude": "^1.0.1",
+    "gl-context": "^0.1.1",
     "icosphere": "^1.0.0"
   }
 }

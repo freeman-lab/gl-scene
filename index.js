@@ -2,11 +2,7 @@ var Material = require('gl-material')
 var Shape = require('gl-shape')
 var Light = require('gl-light')
 var mat4 = require('gl-mat4')
-var mat3 = require('gl-mat3')
 var eye = require('eye-vector')
-var normals = require('normals')
-var glslify = require('glslify')
-var distance = require('euclidean-distance')
 var assign = require('object-assign')
 var inherits = require('inherits')
 var selectify = require('selectify')
@@ -105,12 +101,13 @@ Scene.prototype.shapes = function (objects) {
 
   var stylesheet = {}
   var shapes = []
-  var shape, id, className
+  var shape, material, id, className
   _.forEach(objects, function (object, id) {
     id = object.id = object.id || 'shape-' + id
     className = object.className || object.class || ''
+    material = object.material || 'lambert'
     shape = Shape(self.gl, object)
-    shapes.push(SceneElement(shape, {id: id, className: className, type: 'shape'}))
+    shapes.push(SceneElement(shape, {id: id, className: className, type: 'shape'}, {visible: true, material: material}))
     if (object.style) stylesheet['#' + id] = object.style
   })
 
@@ -135,7 +132,7 @@ Scene.prototype.lights = function (objects) {
     id = object.id || 'light-' + id
     className = object.className || object.class || ''
     light = Light(object)
-    lights.push(SceneElement(light, {id: id, className: className, type: 'light'}))
+    lights.push(SceneElement(light, {id: id, className: className, type: 'light'}, {visible: true}))
     if (object.style) stylesheet['#' + id] = object.style
   })
 
@@ -169,8 +166,6 @@ Scene.prototype.draw = function (camera) {
 
   _.forEach(self._shapes, function (shape) {
     if (shape.attributes.visible) {
-      mat3.normalFromMat4(shape.attributes.modelNormal, shape.attributes.model)
-
       shape.shader = self._materials[shape.attributes.material]
       shape.attributes.geometry.bind(shape.shader.shader)
       shape.shader.shader.uniforms.projection = self.projection
@@ -206,8 +201,8 @@ Scene.prototype.select = function (selector) {
   return selection
 }
 
-function SceneElement (item, opts) {
-  if (!(this instanceof SceneElement)) return new SceneElement(item, opts)
+function SceneElement (item, tags, attributes) {
+  if (!(this instanceof SceneElement)) return new SceneElement(item, tags, attributes)
   var self = this
   
   self.update = function () {
@@ -223,15 +218,15 @@ function SceneElement (item, opts) {
     self._stylesheet = stylesheet
   }
 
-  self.type = opts.type
-  self.id = opts.id
-  self.className = opts.class || opts.className || ''
+  self.type = tags.type
+  self.id = tags.id
+  self.className = tags.className
 
   self.style = {}
-  self.attributes = item.attributes
-  self.position = item.position
-  self.scale = item.scale
-  self.rotation = item.rotation
+  self.attributes = _.assign({}, attributes, item.attributes)
+  _.forEach(item, function (value, key) {
+    if (_.isFunction(value)) self[key] = item[key]
+  })
 }
 
 inherits(SceneCollection, selectify)
