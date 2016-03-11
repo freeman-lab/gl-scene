@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "browserify test.js | testron | tap-spec",
-    "start": "budo example.js",
+    "start": "npm run example",
+    "example": "budo example.js",
     "demo": "node demo.js"
   },
   "repository": {
