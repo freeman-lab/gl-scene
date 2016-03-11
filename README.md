@@ -31,7 +31,7 @@ require('canvas-fit')(canvas)
 Create the scene by passing options for background color:
 
 ```javascript
-var scene = require('./index.js')(gl, {
+var scene = require('gl-scene')(gl, {
   background: [0.02, 0.02, 0.02]
 })
 ```
