@@ -58,7 +58,7 @@ scene.init()
 scene.draw()
 ```
 
-See [example.js](example.js) for a slightly more complex scene, and see the [fruit](demos/fruit.js) • [spheres](demos/spheres.js) • [cubes](demos/cubes.js) demos for behaviors like selection, updates, stylesheets, cameras, and more!
+See [example.js](example.js) for a slightly more complex scene, and see the [fruit](demos/fruit.js) • [spheres](demos/spheres.js) • [cubes](demos/cubes.js) demos for behaviors like selection, updates, stylesheets, cameras, and more! You can run these by cloning this repo and then calling `npm install` and `npm run example` or `npm run demo <name>`.
 
 ## components
 
