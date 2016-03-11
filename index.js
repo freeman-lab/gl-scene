@@ -37,12 +37,12 @@ Scene.prototype.init = function () {
   if (!self._stylesheet) self.stylesheet()
   self._setDefaults()
   if (self._shapes) {
-    self._shapes.each(function (d) {d.stylesheet(self._stylesheet)})
-    self._shapes.each(function (d) {d.update()})
+    self._shapes.each(function (d) { d.stylesheet(self._stylesheet) })
+    self._shapes.each(function (d) { d.update() })
   }
   if (self._lights) {
-    self._lights.each(function (d) {d.stylesheet(self._stylesheet)})
-    self._lights.each(function (d) {d.update()})
+    self._lights.each(function (d) { d.stylesheet(self._stylesheet) })
+    self._lights.each(function (d) { d.update() })
   }
   this.ready = true
 }
@@ -81,12 +81,12 @@ Scene.prototype.stylesheet = function (stylesheet) {
 Scene.prototype.materials = function (objects) {
   var self = this
 
-	if (!objects) {
-		objects = {
-			lambert: require('gl-lambert-material'),
+  if (!objects) {
+    objects = {
+      lambert: require('gl-lambert-material'),
       normal: require('gl-normal-material')
-		}
-	} 
+    }
+  }
 
   var materials = {}
   var constants = {}
@@ -95,7 +95,7 @@ Scene.prototype.materials = function (objects) {
     materials[key] = Material(self.gl, object, constants)
   })
 
-	self._materials = materials
+  self._materials = materials
 }
 
 Scene.prototype.shapes = function (objects) {
@@ -105,8 +105,8 @@ Scene.prototype.shapes = function (objects) {
   var stylesheet = {}
   var shapes = []
   var shape, material, id, className
-  _.forEach(objects, function (object, id) {
-    id = object.id = object.id || 'shape-' + id
+  _.forEach(objects, function (object, index) {
+    id = object.id || 'shape-' + index
     className = object.className || object.class || ''
     material = object.material || 'lambert'
     shape = Shape(self.gl, object)
@@ -131,8 +131,8 @@ Scene.prototype.lights = function (objects) {
   var stylesheet = {}
   var lights = []
   var light, id, className
-  _.forEach(objects, function (object, id) {
-    id = object.id || 'light-' + id
+  _.forEach(objects, function (object, index) {
+    id = object.id || 'light-' + index
     className = object.className || object.class || ''
     light = Light(object)
     lights.push(SceneElement(light, {id: id, className: className, type: 'light'}, {visible: true}))
@@ -163,7 +163,7 @@ Scene.prototype.draw = function (camera) {
     self.gl.clearColor(self.background[0], self.background[1], self.background[2], 1)
     self.gl.clear(self.gl.COLOR_BUFFER_BIT | self.gl.DEPTH_BUFFER_BIT)
   }
-  
+
   self.lighting = _.map(self._lights, 'style')
   _.merge(self.lighting, _.map(self._lights, 'attributes'))
 
@@ -179,7 +179,7 @@ Scene.prototype.draw = function (camera) {
       shape.shader.shader.uniforms.model = shape.attributes.model
       shape.shader.shader.uniforms.modelNormal = shape.attributes.modelNormal
       shape.shader.shader.uniforms.style = shape.style
-      
+
       shape.attributes.geometry.draw(self.gl.TRIANGLES)
       shape.attributes.geometry.unbind()
     }
@@ -189,16 +189,16 @@ Scene.prototype.draw = function (camera) {
 }
 
 Scene.prototype.selectAll = function (selector) {
-  if (!this._shapes) throw Error('No shapes to select')
-  var selection = this._shapes.selectAll(selector)
+  if (!this._shapes && !this._lights) throw Error('No shapes or lights to select')
+  if (this._shapes) var selection = this._shapes.selectAll(selector)
   if (!selection) selection = this._lights.selectAll(selector)
   if (!selection) throw Error('No matching items for: ' + selector)
   return selection
 }
 
 Scene.prototype.select = function (selector) {
-  if (!this._shapes) throw Error('No shapes to select')
-  var selection = this._shapes.select(selector)
+  if (!this._shapes && !this._lights) throw Error('No shapes or lights to select')
+  if (this._shapes) var selection = this._shapes.select(selector)
   if (!selection) selection = this._lights.select(selector)
   if (!selection) throw Error('No matching items for: ' + selector)
   return selection
@@ -207,7 +207,9 @@ Scene.prototype.select = function (selector) {
 function SceneElement (item, tags, attributes) {
   if (!(this instanceof SceneElement)) return new SceneElement(item, tags, attributes)
   var self = this
-  
+
+  var style
+
   self.update = function () {
     style = self._stylesheet['#' + self.id]
     if (style) assign(self.style, style)

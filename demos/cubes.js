@@ -48,7 +48,7 @@ var t = 0
 var now, axis
 var rotate = 0.005
 
-function tick () { 
+function tick () {
   now = time() * 0.001
   axis = Math.sin(now) * 2
   camera.rotate([0, 0, 0], [axis * rotate, -rotate, 0])

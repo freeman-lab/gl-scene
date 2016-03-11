@@ -11,13 +11,14 @@ var scene = require('../index.js')(gl, {background: [0, 0, 0]})
 
 var phases = []
 var positions = []
-for (var i = 0; i < 200; i++) {
+var i
+for (i = 0; i < 200; i++) {
   phases[i] = Math.random() * Math.PI * 2
   positions[i] = [Math.random() * 20 - 10, Math.random() * 20 - 10, Math.random() * 20 - 10]
 }
 
 var shapes = []
-for (var i = 0; i < 200; i++) {
+for (i = 0; i < 200; i++) {
   shapes.push({
     class: 'sphere',
     complex: icosphere(3),
@@ -42,12 +43,9 @@ scene.init()
 
 var camera = orbit(canvas)
 
-var now
-
-var p
 var t = 0
 
-function tick () { 
+function tick () {
   scene.draw(camera)
   scene.selectAll('.sphere').each(function (d, i) {
     d.position(swirl(positions[i], phases[i], t))

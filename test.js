@@ -1,20 +1,20 @@
 var context = require('gl-context')
 var test = require('tape')
 var allclose = require('test-allclose')
-var scene = require('./index')
 var icosphere = require('icosphere')
+var createScene = require('./index')
 
 var canvas = document.body.appendChild(document.createElement('canvas'))
 var gl = context(canvas)
 
 test('construction', function (t) {
-  var scene = require('gl-scene')(gl)
+  var scene = createScene(gl)
   t.ok(scene, 'scene constructed')
   t.end()
 })
 
 test('initialization', function (t) {
-  var scene = require('gl-scene')(gl)
+  var scene = createScene(gl)
   scene.shapes([{complex: icosphere(2)}])
   t.notOk(scene.ready, 'scene uninitialized')
   scene.init()
@@ -23,7 +23,7 @@ test('initialization', function (t) {
 })
 
 test('construction defaults', function (t) {
-  var scene = require('gl-scene')(gl)
+  var scene = createScene(gl)
   allclose(t)(scene.target, [0, 0, 0])
   allclose(t)(scene.observer, [0, -10, 30])
   t.equals(scene.near, 0.01)
@@ -32,8 +32,8 @@ test('construction defaults', function (t) {
 })
 
 test('construction options', function (t) {
-  var scene = require('gl-scene')(gl, {
-    background: [0, 0, 0], 
+  var scene = createScene(gl, {
+    background: [0, 0, 0],
     target: [5, 5, 5],
     observer: [10, 10, 10],
     near: 0,
@@ -48,35 +48,35 @@ test('construction options', function (t) {
 })
 
 test('add one shape', function (t) {
-  var scene = require('gl-scene')(gl)
+  var scene = createScene(gl)
   scene.shapes([{complex: icosphere(2)}])
   t.equals(scene._shapes.length, 1)
   t.end()
 })
 
 test('add many shapes', function (t) {
-  var scene = require('gl-scene')(gl)
+  var scene = createScene(gl)
   scene.shapes([{complex: icosphere(2)}, {complex: icosphere(2)}])
   t.equals(scene._shapes.length, 2)
   t.end()
 })
 
 test('add one light', function (t) {
-  var scene = require('gl-scene')(gl)
+  var scene = createScene(gl)
   scene.lights([{position: [0, 0, 0]}])
   t.equals(scene._lights.length, 1)
   t.end()
 })
 
 test('add many light', function (t) {
-  var scene = require('gl-scene')(gl)
+  var scene = createScene(gl)
   scene.lights([{position: [0, 0, 0]}, {position: [0, 0, 0]}])
   t.equals(scene._lights.length, 2)
   t.end()
 })
 
 test('add shapes and lights', function (t) {
-  var scene = require('gl-scene')(gl)
+  var scene = createScene(gl)
   scene.shapes([{complex: icosphere(2)}, {complex: icosphere(2)}])
   scene.lights([{position: [0, 0, 0]}, {position: [0, 0, 0]}])
   t.equals(scene._shapes.length, 2)
@@ -85,7 +85,7 @@ test('add shapes and lights', function (t) {
 })
 
 test('custom material', function (t) {
-  var scene = require('gl-scene')(gl)
+  var scene = createScene(gl)
   var normal = require('gl-normal-material')
   scene.shapes([{material: 'normal', complex: icosphere(2)}])
   scene.materials({normal: normal})
@@ -97,7 +97,7 @@ test('custom material', function (t) {
 })
 
 test('draw', function (t) {
-  var scene = require('gl-scene')(gl)
+  var scene = createScene(gl)
   scene.shapes([{complex: icosphere(2)}])
   scene.init()
   t.equals(scene.frame, 0)
@@ -107,23 +107,25 @@ test('draw', function (t) {
 })
 
 test('default shape selectors', function (t) {
-  var scene = require('gl-scene')(gl)
+  var scene = createScene(gl)
   scene.shapes([{complex: icosphere(2)}])
   t.equals(scene._shapes[0].id, 'shape-0')
   t.equals(scene._shapes[0].className, '')
+  t.equals(scene.select('#shape-0').length, 1)
   t.end()
 })
 
 test('default light selectors', function (t) {
-  var scene = require('gl-scene')(gl)
+  var scene = createScene(gl)
   scene.lights([{position: [0, 0, 0]}])
   t.equals(scene._lights[0].id, 'light-0')
   t.equals(scene._lights[0].className, '')
+  t.equals(scene.select('#light-0').length, 1)
   t.end()
 })
 
 test('shape visibility', function (t) {
-  var scene = require('gl-scene')(gl)
+  var scene = createScene(gl)
   scene.shapes([{id: 'shape', complex: icosphere(2)}])
   scene.init()
   t.equals(scene._shapes[0].attributes.visible, true)
@@ -137,7 +139,7 @@ test('shape visibility', function (t) {
 })
 
 test('light visibility', function (t) {
-  var scene = require('gl-scene')(gl)
+  var scene = createScene(gl)
   scene.shapes([{id: 'shape', complex: icosphere(2)}])
   scene.lights([{id: 'light', position: [0, 0, 0]}])
   scene.init()
@@ -151,8 +153,8 @@ test('light visibility', function (t) {
   t.end()
 })
 
-test('stylesheet', function (t) {
-  var scene = require('gl-scene')(gl)
+test('add stylesheet', function (t) {
+  var scene = createScene(gl)
   scene.shapes([{id: 'shape', complex: icosphere(2), material: 'normal'}])
   scene.stylesheet({'#shape': {saturation: 0.5, absolute: false}})
   scene.init()

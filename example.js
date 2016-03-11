@@ -7,7 +7,7 @@ fit(canvas)
 
 // create the scene
 var scene = require('./index.js')(gl, {
-  observer: [0, -18, 8], 
+  observer: [0, -18, 8],
   background: [0.02, 0.02, 0.02]
 })
 

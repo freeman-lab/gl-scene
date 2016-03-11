@@ -39,10 +39,10 @@ var shapes = [
 
 var lights = [
   {
-    id: 'point', 
+    id: 'point',
     position: [0, 0, 5, 1],
     style: {color: [1, 1, 1], intensity: 0.0, ambient: 0.0, attenuation: 0.01}
-  }, 
+  },
   {
     id: 'pear-light', class: 'glow',
     position: [0, 8, 3, 1],
@@ -73,16 +73,16 @@ scene.init()
 
 var camera = orbit(canvas)
 
-function tick () { 
-  if ((scene.frame + 5) % 30 == 0) {
+function tick () {
+  if ((scene.frame + 5) % 30 === 0) {
     scene.select('#pear').toggleClass('dark')
     scene.select('#pear-light').toggle()
   }
-  if ((scene.frame + 15) % 30 == 0) {
+  if ((scene.frame + 15) % 30 === 0) {
     scene.select('#apple').toggleClass('dark')
     scene.select('#apple-light').toggle()
   }
-  if ((scene.frame + 25) % 30 == 0) {
+  if ((scene.frame + 25) % 30 === 0) {
     scene.select('#orange').toggleClass('dark')
     scene.select('#orange-light').toggle()
   }
