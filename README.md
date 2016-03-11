@@ -163,8 +163,10 @@ Initialize the scene. Checks that required properties are defined, and replaces 
 
 Draw the scene to the `webgl` context with an optional `camera`. 
 
-The `camera` must have a `view` method. The following are supported:
+The `camera` must have a `view` method, which will be used to update the view before drawing. The following are supported:
 - [`canvas-orbit-camera`](https://npmjs.com/canvas-orbit-camera)
+- [`game-shell-orbit-camera`](https://npmjs.com/game-shell-orbit-camera)
+- [`first-person-camera`](https://npmjs.com/first-person-camera)
 
 ### manipulation
 
