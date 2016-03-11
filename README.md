@@ -222,7 +222,7 @@ Set the rotation of the selection. Only for shapes. Should provide `angle` in ra
 
 How does this module compare to other approaches?
 
-Everything here can be done using lower-level [`stack.gl`](http://stack.gl) components directly, and if you know what you're doing that will always be a more flexible approach! But hopefully this module provides some useful abstractions that make it easier to get started (if you're new), and make easier to reason about complex scenes. 
+Everything here can be done using lower-level [`stack.gl`](http://stack.gl) components directly, and if you know what you're doing that will always be a more flexible approach! But hopefully this module provides some useful abstractions that make it easier to get started (if you're new), and make it easier to reason about more complex scenes. 
 
 Compared to [`three.js`](http://threejs.org/), this approach, and `stack.gl` in general, favors small modules and composition over complex class hierarchies and bundling everythng together. For example, rather than predefine a class hierarchy of materials, `gl-scene` and `gl-material` encourage publishing materials as individual, versioned npm modules. But `three.js` is an awesome project and might be exactly what you want! It currently offers way more functionality, especially for things like complex lighting and shadow mapping, though hopefully we can add some of that with new modules.
 
