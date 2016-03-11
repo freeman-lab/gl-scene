@@ -5,9 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "npm run example",
-    "demo": "node demo.js",
-    "example": "budo example.js"
+    "start": "budo example.js",
+    "demo": "node demo.js"
   },
   "repository": {
     "type": "git",
@@ -29,9 +28,11 @@
   "homepage": "https://github.com/freeman-lab/gl-scene#readme",
   "dependencies": {
     "eye-vector": "0.0.0",
+    "gl-lambert-material": "^1.0.1",
     "gl-light": "^1.0.0",
     "gl-mat4": "^1.1.4",
     "gl-material": "^1.0.0",
+    "gl-normal-material": "^1.0.0",
     "gl-shape": "^1.0.1",
     "inherits": "^2.0.1",
     "lodash": "^4.1.0",
@@ -40,6 +41,7 @@
   },
   "devDependencies": {
     "budo": "~7.0.0",
+    "bunny": "^1.0.1",
     "canvas-fit": "^1.5.0",
     "canvas-orbit-camera": "^1.0.2",
     "extrude": "^1.0.1",

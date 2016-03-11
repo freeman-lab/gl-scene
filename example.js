@@ -1,19 +1,19 @@
+// create webgl context
 var context = require('gl-context')
 var fit = require('canvas-fit')
-var orbit = require('canvas-orbit-camera')
-var mat4 = require('gl-mat4')
-var icosphere = require('icosphere')
-var extrude = require('extrude')
-
 var canvas = document.body.appendChild(document.createElement('canvas'))
 var gl = context(canvas)
 fit(canvas)
 
+// create the scene
 var scene = require('./index.js')(gl, {
   observer: [0, -18, 8], 
   background: [0.02, 0.02, 0.02]
 })
 
+// create shapes
+var icosphere = require('icosphere')
+var extrude = require('extrude')
 var shapes = [
   {
     complex: extrude([[-50, 50], [-50, -50], [50, -50], [50, 50]], {top: 0, bottom: -2}),
@@ -37,6 +37,7 @@ var shapes = [
   }
 ]
 
+// create lights
 var lights = [
   {
     position: [0, 8, 3],
@@ -52,6 +53,7 @@ var lights = [
   }
 ]
 
+// render the scene
 scene.shapes(shapes)
 scene.lights(lights)
 scene.init()
