@@ -4,7 +4,9 @@
 ![experimental][experimental-image]
 [![js-standard-style][standard-image]][standard-url]
 
-Design and manipulate simple 3d scenes using [`stack.gl`](http://stack.gl) components. The goal of this module is to make it easy to build and manipulate scenes with shapes and lights, while maintaining full flexibility and composability with the [`stack.gl`](http://stack.gl) ecosystem, including the emphasis on writing modular shader code. It provides a higher-level interface on top of core stack.gl components, and includes a CSS style selector system for controlling appearence. Much of the functionality is defined in separate modules that can be used on their own, in particular [`gl-material`](http://github.com/stackgl/gl-material) and [`gl-shape`](http://github.com/stackgl/gl-shape). 
+Design and manipulate simple 3d scenes using [`stack.gl`](http://stack.gl) components. The goal of this module is to make it easy to build and manipulate scenes, while maintaining full flexibility and composability with the [`stack.gl`](http://stack.gl) ecosystem, including the emphasis on writing modular shader code. It provides a higher-level interface on top of core stack.gl components, and includes a CSS style selector system for controlling appearence. Much of the functionality is defined in separate modules that can be used on their own, in particular [`gl-material`](http://github.com/stackgl/gl-material) and [`gl-shape`](http://github.com/stackgl/gl-shape). 
+
+
 
 ![fruit](gifs/fruit.gif)
 
@@ -173,9 +175,12 @@ The `camera` must have a `view` method, which will be used to update the view be
 All manipulation proceeds by selecting one or more shapes or lights by `id` or `class` and then changing properties.
 
 #### `selection = scene.select(selector)`
+
+Returns the first light or shape that matches the given tag. Selector should be of the form: `#id` or `.class`. Will first look for a matching shape, and then a matching light.
+
 #### `selection = scene.selectAll(selector)`
 
-Returns the first light or shape that matches the given tag. Selector should be of the form: `#id` or `.class`. Will first look for a matching shape, and then a matching light. `select` returns one element, whereas `selectAll` returns many.
+Same as `select`, but will return all matching elements.
 
 #### `selection.style({name: value})`
 
