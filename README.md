@@ -230,6 +230,10 @@ Everything here can be done using lower-level [`stack.gl`](http://stack.gl) comp
 
 Compared to [`three.js`](http://threejs.org/), this approach, and `stack.gl` in general, favors small modules and composition over complex class hierarchies and bundling everythng together. For example, rather than predefine a class hierarchy of materials, `gl-scene` and `gl-material` encourage publishing materials as individual, versioned npm modules. But `three.js` is an awesome project and might be exactly what you want! It definitely offers way more functionality than `gl-scene`, especially for things like complex lighting and shadow mapping, though hopefully we can add some of that with new modules.
 
+## license
+
+MIT
+
 [npm-image]: https://img.shields.io/badge/npm-v1.0.0-lightgray.svg?style=flat-square
 [npm-url]: https://npmjs.org/package/gl-scene
 [standard-image]: https://img.shields.io/badge/code%20style-standard-lightgray.svg?style=flat-square
