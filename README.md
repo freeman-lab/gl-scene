@@ -4,9 +4,9 @@
 ![experimental][experimental-image]
 [![js-standard-style][standard-image]][standard-url]
 
-Design and manipulate simple 3d scenes using [`stack.gl`](http://stack.gl) components. The goal of this module is to make it easy to build and manipulate scenes, while maintaining full flexibility and composability with the [`stack.gl`](http://stack.gl) ecosystem, including the emphasis on writing modular shader code. It provides a higher-level interface on top of core stack.gl components, and includes a CSS style selector system for controlling appearence. Much of the functionality is defined in separate modules that can be used on their own, in particular [`gl-material`](http://github.com/stackgl/gl-material) and [`gl-shape`](http://github.com/stackgl/gl-shape). 
+Design and manipulate 3d scenes using [`stack.gl`](http://stack.gl) components. 
 
-
+The goal of this module is to make it easier to build 3d scenes, while maintaining full flexibility and composability with the [`stack.gl`](http://stack.gl) ecosystem, including the emphasis on writing modular shader code. It provides a higher-level interface on top of core stack.gl components, and includes a CSS style selector system for controlling appearence. Much of the functionality is defined in separate modules that can be used on their own, in particular [`gl-material`](http://github.com/stackgl/gl-material) and [`gl-shape`](http://github.com/stackgl/gl-shape). 
 
 ![fruit](gifs/fruit.gif)
 
@@ -129,7 +129,7 @@ The options are:
 Add a list of `shapes` to the scene.
 
 Each shape in the `shapes` array has these properties:
-- `complex` a 3d mesh for rendering the shape **required**
+- `complex` a 3d mesh for rendering the shape, must define `positions` and `faces`, can define `normals` and `uvs` **required**
 - `material` a material name, default `lambert`
 - `position` iniitial position of the shape as an array of floats, default `[0, 0, 0]`
 - `scale` initial scale of the shape as a number or an array of floats, default `1`
@@ -217,6 +217,10 @@ Set the scale of the selection. Only for shapes. Should be a length 3 vector or 
 #### `selection.rotation(angle, [axis])`
 
 Set the rotation of the selection. Only for shapes. Should provide `angle` in radians and a length 3 vector for `axis`. Can also provide a function which takes the current 3x3 rotation matrix as input returns a new rotation matrix.
+
+## comparisons
+
+Everything here can be done using lower-level [`stack.gl`](http://stack.gl) components directly, and if you know what you're doing that will always be a more flexible approach! But hopefully this module provides some useful abstractions that make it easier to get started (if you're new), and make easier to reason about complex scenes. Compared to [`three.js`](http://threejs.org/), this module, and `stack.gl` in general, favors small modules and composition over complex class hierarchies and bundling everythng together. For example, rather than predefine a class hierarchy of materials, `gl-scene` and `gl-material` encourage publishing materials as individual, versioned npm modules. But `three.js` is an awesome project and might be exactly what you want! It also currently offers way more functionality, especially for things like complex lighting and shadow mapping, though hopefully we can add some of that with new modules.
 
 [npm-image]: https://img.shields.io/badge/npm-v1.0.0-lightgray.svg?style=flat-square
 [npm-url]: https://npmjs.org/package/gl-scene
