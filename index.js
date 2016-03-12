@@ -58,12 +58,9 @@ Scene.prototype._setDefaults = function () {
   self._lights.each(function (d) {
     _.defaults(d.style, {
       color: [1.0, 1.0, 1.0],
-      attenuation: 0.05,
+      radius: 30.0,
       intensity: 3.0,
-      ambient: 1.0,
-      cutoff: 180,
-      target: [0, 0, -1],
-      exponent: 0.0
+      ambient: 1.0
     })
   })
 }
