@@ -8,7 +8,9 @@ Design and manipulate 3d scenes using [`stack.gl`](http://stack.gl) components.
 
 The goal of this module is to make it easier to build 3d scenes, while maintaining full flexibility and composability with the [`stack.gl`](http://stack.gl) ecosystem, including the emphasis on writing modular shader code. It provides a higher-level interface on top of core `stack.gl` components, and includes a CSS style selector system for controlling appearence. Much of the functionality is defined in separate modules that can be used on their own, in particular [`gl-material`](http://github.com/stackgl/gl-material) and [`gl-shape`](http://github.com/stackgl/gl-shape). 
 
-![fruit](gifs/fruit.gif)
+[live demo](http://gl-scene.surge.sh)
+
+[![fruit](gifs/fruit.gif)](http://gl-scene.surge.sh)
 
 ## install
 

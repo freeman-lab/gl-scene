@@ -7,7 +7,9 @@
     "test": "browserify test.js | testron | tap-spec",
     "start": "npm run example",
     "example": "budo example.js",
-    "demo": "node demo.js"
+    "demo": "node demo.js",
+    "build": "browserify site/index.js -o site/bundle.js",
+    "deploy": "surge site gl-scene.surge.sh"
   },
   "repository": {
     "type": "git",
@@ -46,6 +48,7 @@
     "bunny": "^1.0.1",
     "canvas-fit": "^1.5.0",
     "canvas-orbit-camera": "^1.0.2",
+    "control-panel": "^1.1.1",
     "extrude": "^1.0.1",
     "gl-context": "^0.1.1",
     "icosphere": "^1.0.0",
