@@ -223,9 +223,17 @@ Set the rotation of the selection. Only for shapes. Should provide `angle` in ra
 
 If you have ideas or problems, post an issue or submit a PR!
 
+## see also
+
+Related ideas are being explored in some other really cool modules
+- [`scene-tree`](https://github.com/hughsk/scene-tree)
+- [`regl`](https://github.com/mikolalysenko/regl)
+
+It'd be fun to try composing some of these!
+
 ## comparisons
 
-How does this module compare to other approaches?
+How does this approach compare to others?
 
 Everything here can be done using lower-level [`stack.gl`](http://stack.gl) components directly, and if you know what you're doing that will always be a more flexible approach! But hopefully this module provides some useful abstractions that make it easier to get started (if you're new), and make it easier to reason about more complex scenes. 
 
