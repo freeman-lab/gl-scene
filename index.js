@@ -157,7 +157,7 @@ Scene.prototype.draw = function (camera) {
 
   self.gl.enable(self.gl.DEPTH_TEST)
   if (self.background) {
-    self.gl.clearColor(self.background[0], self.background[1], self.background[2], 1)
+    self.gl.clearColor(self.background[0], self.background[1], self.background[2], self.background[3] === undefined ? 1 : self.background[3])
     self.gl.clear(self.gl.COLOR_BUFFER_BIT | self.gl.DEPTH_BUFFER_BIT)
   }
 
